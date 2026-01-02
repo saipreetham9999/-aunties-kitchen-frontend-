@@ -3,13 +3,18 @@
     <button (click)="goBack()" class="btn btn-secondary">&larr; Back to Dashboard</button>
     <h1>Manage Users</h1>
     <p>Create, verify, and manage customer accounts.</p>
+    <button (click)="toggleCreateUserSection()" class="btn btn-primary toggle-button">
+      <span *ngIf="!showCreateUserSection">Create New Customer</span>
+      <span *ngIf="showCreateUserSection">View All Customers</span>
+    </button>
   </header>
 
   <div *ngIf="feedbackMessage" class="feedback-message success">{{ feedbackMessage }}</div>
   <div *ngIf="errorMessage" class="feedback-message error">{{ errorMessage }}</div>
 
-  <div class="content-grid">
-    <section class="card">
+  <div class="content-sections">
+    <!-- Display All Customers Section -->
+    <section class="card" *ngIf="!showCreateUserSection">
       <h2 class="card-header">All Customers</h2>
       <div class="card-content">
         <div class="table-container">
@@ -44,7 +49,8 @@
       </div>
     </section>
 
-    <section class="card">
+    <!-- Create New Customer Section -->
+    <section class="card" *ngIf="showCreateUserSection">
       <h2 class="card-header">Create New Customer</h2>
       <div class="card-content">
         <form [formGroup]="createUserForm" (ngSubmit)="onCreateUser()" class="modern-form">

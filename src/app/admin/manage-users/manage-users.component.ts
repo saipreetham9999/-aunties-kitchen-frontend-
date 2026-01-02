@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { UserService, User } from '../user.service';
+import { AuthService } from '../../auth/auth.service'; // Import AuthService
 
 @Component({
   selector: 'app-manage-users',
@@ -19,8 +20,11 @@ export class ManageUsersComponent implements OnInit {
   feedbackMessage: string | null = null;
   errorMessage: string | null = null;
 
+  showCreateUserSection: boolean = false; // New flag to control visibility
+
   constructor(
     private userService: UserService,
+    private authService: AuthService, // Inject AuthService
     private fb: FormBuilder,
     private router: Router
   ) {
@@ -49,14 +53,20 @@ export class ManageUsersComponent implements OnInit {
       this.handleError('Please fill out all fields correctly.');
       return;
     }
-    const userData = { ...this.createUserForm.value, role: 'ROLE_CUSTOMER' };
-    this.userService.createUser(userData).subscribe({
-      next: (newUser) => {
-        this.showFeedback(`Customer ${newUser.name} created. An OTP has been sent to their email.`);
-        this.customers.push(newUser);
+    const userData = {
+      name: this.createUserForm.value.name,
+      email: this.createUserForm.value.email,
+      password: this.createUserForm.value.password
+    };
+
+    this.authService.register(userData).subscribe({
+      next: (response) => {
+        this.showFeedback(response.message || `Customer ${userData.name} created. An OTP has been sent to their email for verification.`);
+        this.loadUsers(); // Reload users to get the newly created (unverified) user
         this.createUserForm.reset();
+        this.showCreateUserSection = false; // Hide the form after creation
       },
-      error: (err) => this.handleError(err.error?.message || 'Failed to create user.')
+      error: (err) => this.handleError(err.error?.message || 'Failed to create user. The email might already be in use.')
     });
   }
 
@@ -94,6 +104,13 @@ export class ManageUsersComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/admin-dashboard']);
+  }
+
+  toggleCreateUserSection(): void {
+    this.showCreateUserSection = !this.showCreateUserSection;
+    if (this.showCreateUserSection) {
+      this.createUserForm.reset(); // Clear form when showing
+    }
   }
 
   private showFeedback(message: string): void {

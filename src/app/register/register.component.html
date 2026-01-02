@@ -1,24 +1,41 @@
-<div class="register-container">
-  <h2>Join Auntie's Kitchen - Register</h2>
-  <form (ngSubmit)="onRegister()">
-    <div class="form-group">
-      <label for="name">Name:</label>
-      <input type="text" id="name" [(ngModel)]="name" name="name" required>
+<div class="cafe-register-wrapper">
+  <div class="cafe-register-container">
+    <div class="cafe-header">
+      <img src="assets/logo.png" alt="Auntie's Kitchen Logo" class="cafe-logo">
+      <h1>Join Auntie's Kitchen</h1>
+      <p class="tagline">Start Your Bright Life Ahead!</p>
     </div>
-    <div class="form-group">
-      <label for="email">Email:</label>
-      <input type="email" id="email" [(ngModel)]="email" name="email" required>
+
+    <div class="cafe-form-card">
+      <h2>Create Your Account</h2>
+      <form (ngSubmit)="onRegister()" class="cafe-register-form">
+        <div class="form-field">
+          <label for="name">Your Name</label>
+          <input type="text" id="name" [(ngModel)]="name" name="name" required placeholder="John Doe">
+        </div>
+        <div class="form-field">
+          <label for="email">Email</label>
+          <input type="email" id="email" [(ngModel)]="email" name="email" required placeholder="your.email@example.com">
+        </div>
+        <div class="form-field">
+          <label for="password">Password</label>
+          <input type="password" id="password" [(ngModel)]="password" name="password" required placeholder="••••••••">
+        </div>
+        <div class="form-field">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" [(ngModel)]="confirmPassword" name="confirmPassword" required placeholder="••••••••">
+        </div>
+
+        <button type="submit" class="cafe-btn-primary" [disabled]="!isFormValid()">Register</button>
+      </form>
+
+      <div *ngIf="message" class="feedback-message {{ message.includes('successful') ? 'success' : 'error' }}">
+        {{ message }}
+      </div>
+
+      <div class="cafe-links">
+        <p>Already have an account? <a routerLink="/login" class="cafe-link">Login here.</a></p>
+      </div>
     </div>
-    <div class="form-group">
-      <label for="password">Password:</label>
-      <input type="password" id="password" [(ngModel)]="password" name="password" required>
-    </div>
-    <div class="form-group">
-      <label for="confirmPassword">Confirm Password:</label>
-      <input type="password" id="confirmPassword" [(ngModel)]="confirmPassword" name="confirmPassword" required>
-    </div>
-    <button type="submit" [disabled]="!isFormValid()">Register</button>
-  </form>
-  <p *ngIf="message" class="feedback-message">{{ message }}</p> <!-- Feedback message -->
-  <p>Already have an account? <a routerLink="/login">Login here.</a></p>
+  </div>
 </div>

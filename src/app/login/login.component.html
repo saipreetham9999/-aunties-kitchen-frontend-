@@ -1,17 +1,35 @@
-<div class="login-container">
-  <h2>Welcome to Auntie's Kitchen - Login</h2>
-  <form (ngSubmit)="onLogin()">
-    <div class="form-group">
-      <label for="email">Email:</label>
-      <input type="email" id="email" [(ngModel)]="email" name="email" required>
+<div class="cafe-login-wrapper">
+  <div class="cafe-login-container">
+    <div class="cafe-header">
+      <img src="assets/logo.png" alt="Auntie's Kitchen Logo" class="cafe-logo">
+      <h1>Welcome to Auntie's Kitchen</h1>
+      <p class="tagline">Bright Life Ahead, One Sip at a Time!</p>
     </div>
-    <div class="form-group">
-      <label for="password">Password:</label>
-      <input type="password" id="password" [(ngModel)]="password" name="password" required>
+
+    <div class="cafe-form-card">
+      <h2>Login to Your Account</h2>
+      <form (ngSubmit)="onLogin()" class="cafe-login-form">
+        <div class="form-field">
+          <label for="email">Email</label>
+          <input type="email" id="email" [(ngModel)]="email" name="email" required placeholder="your.email@example.com">
+        </div>
+        <div class="form-field">
+          <label for="password">Password</label>
+          <input type="password" id="password" [(ngModel)]="password" name="password" required placeholder="••••••••">
+        </div>
+
+        <button type="submit" class="cafe-btn-primary">Sign In</button>
+      </form>
+
+      <div *ngIf="message" class="feedback-message {{ message.includes('successful') ? 'success' : 'error' }}">
+        {{ message }}
+      </div>
+
+      <div class="cafe-links">
+        <p>Don't have an account? <a routerLink="/register" class="cafe-link">Register here.</a></p>
+        <p><a routerLink="/verify-otp" class="cafe-link">Verify OTP</a></p>
+        <!-- <p><a href="#" class="cafe-link disabled">Forgot Password?</a></p> -->
+      </div>
     </div>
-    <button type="submit">Login</button>
-  </form>
-  <p *ngIf="message" class="feedback-message">{{ message }}</p> <!-- Feedback message -->
-  <p>Don't have an account? <a routerLink="/register">Register here.</a></p>
-  <p><a href="#" disabled>Forgot Password?</a></p>
+  </div>
 </div>

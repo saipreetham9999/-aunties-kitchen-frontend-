@@ -28,13 +28,31 @@ header .btn-secondary {
   left: 0;
 }
 
-.content-grid {
+.toggle-button {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+}
+
+.content-sections {
+  display: flex; /* Use flexbox to manage sections */
+  justify-content: center; /* Center the content */
+  margin-top: 2rem;
+}
+
+.content-sections .card {
+  width: 100%; /* Take full width when only one is visible */
+  max-width: 1400px; /* Max width for content */
+}
+
+/* Original content-grid is no longer needed for this component's main layout */
+/* .content-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 2rem;
   max-width: 1400px;
   margin: 0 auto;
-}
+} */
 
 .card {
   background: #ffffff;
