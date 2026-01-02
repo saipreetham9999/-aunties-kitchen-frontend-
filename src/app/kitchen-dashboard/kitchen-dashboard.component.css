@@ -1,0 +1,10 @@
+.dashboard-container {
+  padding: 20px;
+  text-align: center;
+}
+
+.order-management {
+  margin-top: 20px;
+  border: 1px dashed #ccc;
+  padding: 20px;
+}

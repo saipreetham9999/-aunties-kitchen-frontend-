@@ -1,78 +1,63 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators'; // Import tap for side effects
+import { tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private baseUrl = 'http://localhost:8080/api/auth';
-  private userKey = 'currentUser'; // Key for storing user data in localStorage
+  private tokenKey = 'authToken';
+  private roleKey = 'userRole';
 
   constructor(private http: HttpClient) { }
 
   register(userData: any): Observable<any> {
-    console.log('AuthService: Registering user. Sending data:', userData);
-    return this.http.post(`${this.baseUrl}/register`, userData).pipe(
-      tap(
-        response => console.log('AuthService: Register successful. Response:', response),
-        error => console.error('AuthService: Register failed. Error:', error)
-      )
-    );
+    return this.http.post(`${this.baseUrl}/register`, userData);
   }
 
   login(credentials: any): Observable<any> {
-    console.log('AuthService: Logging in user. Sending credentials:', credentials);
-    return this.http.post(`${this.baseUrl}/login`, credentials).pipe(
-      tap(
-        (response: any) => {
-          console.log('AuthService: Login successful. Response:', response);
-          if (response && response.user) { // Assuming the backend returns a 'user' object
-            this.saveUser(response.user);
-          }
-        },
-        error => console.error('AuthService: Login failed. Error:', error)
-      )
+    return this.http.post<any>(`${this.baseUrl}/login`, credentials).pipe(
+      tap(response => {
+        if (response && response.token && response.role) {
+          this.saveAuthData(response.token, response.role);
+          console.log('AuthService: Login successful. Token and role saved.');
+        } else {
+          console.error('AuthService: Login failed. Invalid response from server.');
+        }
+      })
     );
   }
 
   verifyOtp(otpData: { email: string, otp: string }): Observable<any> {
-    console.log('AuthService: Verifying OTP. Sending data:', otpData);
-    return this.http.post(`${this.baseUrl}/verify-otp`, otpData).pipe(
-      tap(
-        response => console.log('AuthService: OTP verification successful. Response:', response),
-        error => console.error('AuthService: OTP verification failed. Error:', error)
-      )
-    );
+    return this.http.post(`${this.baseUrl}/verify-otp`, otpData);
   }
 
   resendOtp(email: string): Observable<any> {
-    console.log('AuthService: Resending OTP for email:', email);
-    return this.http.post(`${this.baseUrl}/resend-otp`, { email }).pipe(
-      tap(
-        response => console.log('AuthService: Resend OTP successful. Response:', response),
-        error => console.error('AuthService: Resend OTP failed. Error:', error)
-      )
-    );
+    return this.http.post(`${this.baseUrl}/resend-otp`, { email });
   }
 
-  // New methods for user management
-  private saveUser(user: any): void {
-    localStorage.setItem(this.userKey, JSON.stringify(user));
+  private saveAuthData(token: string, role: string): void {
+    localStorage.setItem(this.tokenKey, token);
+    localStorage.setItem(this.roleKey, role);
   }
 
-  getUser(): any | null {
-    const userJson = localStorage.getItem(this.userKey);
-    return userJson ? JSON.parse(userJson) : null;
+  getToken(): string | null {
+    return localStorage.getItem(this.tokenKey);
   }
 
   getUserRole(): string | null {
-    const user = this.getUser();
-    return user && user.role ? user.role : null;
+    return localStorage.getItem(this.roleKey);
   }
 
   logout(): void {
-    localStorage.removeItem(this.userKey);
+    localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.roleKey);
+    console.log('AuthService: User logged out. Token and role removed.');
+  }
+
+  isAuthenticated(): boolean {
+    return this.getToken() !== null;
   }
 }
