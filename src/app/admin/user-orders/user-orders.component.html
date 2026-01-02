@@ -1,0 +1,38 @@
+<div class="user-orders-container">
+  <header>
+    <button (click)="goBack()" class="btn btn-secondary">&larr; Back to Admin Dashboard</button>
+    <h1>Orders for User {{ userId }}</h1>
+    <p>A complete history of all orders placed by this user.</p>
+  </header>
+
+  <div *ngIf="errorMessage" class="feedback-message error">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!errorMessage && orders.length === 0" class="feedback-message info">
+    This user has not placed any orders yet.
+  </div>
+
+  <div *ngIf="orders.length > 0" class="order-list">
+    <div *ngFor="let order of orders" class="order-card">
+      <div class="order-header">
+        <span class="order-id">Order #{{ order.id }}</span>
+        <span class="order-date">{{ order.date }}</span>
+      </div>
+      <div class="order-status status-{{ order.status.toLowerCase().replace('_', '-') }}">
+        Status: {{ order.status }}
+      </div>
+      <div class="order-details">
+        <h4>Items:</h4>
+        <ul>
+          <li *ngFor="let item of order.items">
+            {{ item.quantity }} x {{ item.name }} - ${{ item.price | number:'1.2-2' }}
+          </li>
+        </ul>
+        <div class="order-total">
+          <strong>Total: ${{ order.total | number:'1.2-2' }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

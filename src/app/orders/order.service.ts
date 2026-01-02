@@ -12,7 +12,7 @@ export interface OrderItem {
 export interface Order {
   id: string;
   date: string;
-  status: 'NEW' | 'IN_PROGRESS' | 'READY' | 'COMPLETED' | 'CANCELLED'; // Adjusted to likely backend statuses
+  status: 'NEW' | 'IN_PROGRESS' | 'READY' | 'COMPLETED' | 'CANCELLED';
   total: number;
   items: OrderItem[];
 }
@@ -22,14 +22,13 @@ export interface Order {
 })
 export class OrderService {
   private apiUrl = 'http://localhost:8080/api/orders';
+  private adminApiUrl = 'http://localhost:8080/api/admin/orders'; // New base URL for this specific feature
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
   private createAuthHeaders(): HttpHeaders {
     const token = this.authService.getToken();
     if (!token) {
-      // This case should ideally be handled by route guards
-      // but as a safeguard, we can throw an error.
       throw new Error('No authentication token found!');
     }
     return new HttpHeaders({
@@ -47,11 +46,21 @@ export class OrderService {
     }
   }
 
-  // For ROLE_ADMIN
+  // For ROLE_ADMIN to get all orders
   getAllOrders(): Observable<Order[]> {
     try {
       const headers = this.createAuthHeaders();
       return this.http.get<Order[]>(`${this.apiUrl}/admin/all`, { headers });
+    } catch (error) {
+      return throwError(() => error);
+    }
+  }
+
+  // For ROLE_ADMIN to get orders for a specific user
+  getOrdersByUserId(userId: string): Observable<Order[]> {
+    try {
+      const headers = this.createAuthHeaders();
+      return this.http.get<Order[]>(`${this.adminApiUrl}/user/${userId}`, { headers });
     } catch (error) {
       return throwError(() => error);
     }

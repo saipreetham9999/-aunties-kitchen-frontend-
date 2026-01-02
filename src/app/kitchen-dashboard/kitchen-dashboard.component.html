@@ -1,9 +1,44 @@
-<div class="dashboard-container">
-  <h2>Kitchen Dashboard</h2>
-  <p>Manage incoming orders and update their status.</p>
+<div class="kitchen-dashboard-container">
+  <header>
+    <h1>Kitchen Dashboard</h1>
+    <p>View and manage active orders.</p>
+  </header>
 
-  <!-- Placeholder for order management -->
-  <div class="order-management">
-    <p>Order list will appear here...</p>
+  <!-- Feedback Messages -->
+  <div *ngIf="feedbackMessage" class="feedback-message success">{{ feedbackMessage }}</div>
+  <div *ngIf="errorMessage" class="feedback-message error">{{ errorMessage }}</div>
+
+  <div *ngIf="!errorMessage && activeOrders.length === 0" class="feedback-message info">
+    No active orders at the moment.
+  </div>
+
+  <div class="order-grid">
+    <div *ngFor="let order of activeOrders" class="order-ticket card">
+      <div class="ticket-header">
+        <span class="order-id">Order #{{ order.id }}</span>
+        <span class="order-status status-{{ order.status.toLowerCase().replace('_', '-') }}">{{ order.status }}</span>
+      </div>
+      <div class="ticket-body">
+        <ul class="item-list">
+          <li *ngFor="let item of order.items">
+            <span class="quantity">{{ item.quantity }}x</span>
+            <span class="name">{{ item.name }}</span>
+          </li>
+        </ul>
+      </div>
+      <div class="ticket-actions">
+        <ng-container [ngSwitch]="order.status">
+          <button *ngSwitchCase="'NEW'" class="btn btn-primary" (click)="onUpdateStatus(order, 'IN_PROGRESS')">
+            Start Cooking
+          </button>
+          <button *ngSwitchCase="'IN_PROGRESS'" class="btn btn-success" (click)="onUpdateStatus(order, 'READY')">
+            Mark as Ready
+          </button>
+          <div *ngSwitchCase="'READY'" class="ready-message">
+            Ready for pickup
+          </div>
+        </ng-container>
+      </div>
+    </div>
   </div>
 </div>

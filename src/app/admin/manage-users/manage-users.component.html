@@ -1,0 +1,68 @@
+<div class="management-container">
+  <header>
+    <button (click)="goBack()" class="btn btn-secondary">&larr; Back to Dashboard</button>
+    <h1>Manage Users</h1>
+    <p>Create, verify, and manage customer accounts.</p>
+  </header>
+
+  <div *ngIf="feedbackMessage" class="feedback-message success">{{ feedbackMessage }}</div>
+  <div *ngIf="errorMessage" class="feedback-message error">{{ errorMessage }}</div>
+
+  <div class="content-grid">
+    <section class="card">
+      <h2 class="card-header">All Customers</h2>
+      <div class="card-content">
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of customers">
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                  <div *ngIf="user.emailVerified" class="status-badge verified">Verified</div>
+                  <div *ngIf="!user.emailVerified" class="otp-verify-cell">
+                    <input type="text" class="otp-input" placeholder="OTP" [(ngModel)]="userOtps[user.id]">
+                    <button class="btn btn-success btn-sm" (click)="onVerifyUser(user)">Verify</button>
+                  </div>
+                </td>
+                <td class="actions-cell">
+                  <button class="btn btn-secondary btn-sm" (click)="onViewOrders(user)">Orders</button>
+                  <button class="btn btn-danger btn-sm" (click)="onDeleteUser(user)">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card-header">Create New Customer</h2>
+      <div class="card-content">
+        <form [formGroup]="createUserForm" (ngSubmit)="onCreateUser()" class="modern-form">
+          <div class="form-field">
+            <label for="name">Name</label>
+            <input id="name" type="text" formControlName="name" placeholder="e.g., John Doe">
+          </div>
+          <div class="form-field">
+            <label for="email">Email</label>
+            <input id="email" type="email" formControlName="email" placeholder="e.g., user@example.com">
+          </div>
+          <div class="form-field">
+            <label for="password">Password</label>
+            <input id="password" type="password" formControlName="password" placeholder="Min 6 characters">
+          </div>
+          <button type="submit" class="btn btn-primary" [disabled]="createUserForm.invalid">Create Customer</button>
+        </form>
+      </div>
+    </section>
+  </div>
+</div>

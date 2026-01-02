@@ -1,0 +1,75 @@
+<div class="management-container">
+  <header>
+    <button (click)="goBack()" class="btn btn-secondary">&larr; Back to Dashboard</button>
+    <h1>Manage Menu</h1>
+    <p>Add, view, update, and delete menu items.</p>
+  </header>
+
+  <div *ngIf="feedbackMessage" class="feedback-message success">{{ feedbackMessage }}</div>
+  <div *ngIf="errorMessage" class="feedback-message error">{{ errorMessage }}</div>
+
+  <div class="content-grid">
+    <section class="card">
+      <h2 class="card-header">All Menu Items</h2>
+      <div class="card-content">
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of menuItems">
+                <td>{{ item.name }}</td>
+                <td>{{ item.category }}</td>
+                <td>{{ item.price | currency }}</td>
+                <td>
+                  <span class="status-badge" [class.active]="item.isActive">{{ item.isActive ? 'Active' : 'Inactive' }}</span>
+                </td>
+                <td class="actions-cell">
+                  <button class="btn btn-secondary btn-sm" (click)="onEdit(item)">Edit</button>
+                  <button class="btn btn-danger btn-sm" (click)="onDelete(item)">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card-header">{{ editingItem ? 'Edit Menu Item' : 'Add New Menu Item' }}</h2>
+      <div class="card-content">
+        <form [formGroup]="menuItemForm" (ngSubmit)="onFormSubmit()" class="modern-form">
+          <div class="form-field">
+            <label for="menu-name">Item Name</label>
+            <input id="menu-name" type="text" formControlName="name" placeholder="e.g., Chicken Biryani">
+          </div>
+          <div class="form-field">
+            <label for="price">Price</label>
+            <input id="price" type="number" formControlName="price" placeholder="e.g., 15.99">
+          </div>
+          <div class="form-field">
+            <label for="category">Category</label>
+            <input id="category" type="text" formControlName="category" placeholder="e.g., Main Course">
+          </div>
+          <div class="form-field-checkbox">
+            <input id="isActive" type="checkbox" formControlName="isActive">
+            <label for="isActive">Is Active</label>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="menuItemForm.invalid">
+              {{ editingItem ? 'Update Item' : 'Add to Menu' }}
+            </button>
+            <button type="button" class="btn btn-secondary" *ngIf="editingItem" (click)="resetForm()">Cancel Edit</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+</div>

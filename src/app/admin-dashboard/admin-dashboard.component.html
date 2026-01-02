@@ -1,10 +1,34 @@
-<div class="dashboard-container">
-  <h2>Admin Dashboard</h2>
-  <p>Welcome, Admin! You have full access.</p>
+<div class="admin-dashboard-container">
+  <header>
+    <h1>Admin Dashboard</h1>
+    <p>Select a category to manage.</p>
+  </header>
 
-  <div class="admin-actions">
-    <button>Manage Users</button>
-    <button>View All Orders</button>
-    <button>Manage Menu</button>
+  <div class="nav-grid">
+    <a routerLink="/admin/users" class="nav-card">
+      <div class="nav-card-icon">&#128101;</div>
+      <div class="nav-card-title">Manage Users</div>
+      <div class="nav-card-description">Manage customer accounts, view their orders, and handle verification.</div>
+    </a>
+    <a routerLink="/admin/staff" class="nav-card">
+      <div class="nav-card-icon">&#128119;</div>
+      <div class="nav-card-title">Manage Staff</div>
+      <div class="nav-card-description">Manage Kitchen and Cashier roles, including secure admin promotions.</div>
+    </a>
+    <a routerLink="/admin/menu" class="nav-card">
+      <div class="nav-card-icon">&#127869;</div>
+      <div class="nav-card-title">Manage Menu</div>
+      <div class="nav-card-description">Full CRUD operations for menu items (Create, Read, Update, Delete).</div>
+    </a>
+    <a routerLink="/admin/orders" class="nav-card">
+      <div class="nav-card-icon">&#128220;</div>
+      <div class="nav-card-title">Manage Orders</div>
+      <div class="nav-card-description">View a complete history of all orders placed in the system.</div>
+    </a>
+    <a class="nav-card disabled">
+      <div class="nav-card-icon">&#128179;</div>
+      <div class="nav-card-title">Payments</div>
+      <div class="nav-card-description">To be developed later.</div>
+    </a>
   </div>
 </div>

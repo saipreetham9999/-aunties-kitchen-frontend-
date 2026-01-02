@@ -1,0 +1,98 @@
+.management-container {
+  padding: 2rem;
+  background-color: #f4f7f6;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+header h1 {
+  font-size: 2.5rem;
+  color: #2c3e50;
+  margin: 0;
+}
+
+header p {
+  font-size: 1.1rem;
+  color: #7f8c8d;
+}
+
+header .btn-secondary {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.order-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.order-card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #ecf0f1;
+  margin-bottom: 1rem;
+}
+
+.order-id { font-weight: 600; color: #34495e; }
+.order-date { font-size: 0.9rem; color: #7f8c8d; }
+
+.order-status {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.status-new { background-color: #eaf2f8; color: #3498db; }
+.status-in_progress { background-color: #fef9e7; color: #f39c12; }
+.status-ready { background-color: #d4edda; color: #28a745; }
+.status-completed { background-color: #e8f6f3; color: #1abc9c; }
+.status-cancelled { background-color: #fdedec; color: #e74c3c; }
+
+.order-details h4 { margin: 0 0 0.5rem 0; font-size: 1rem; color: #34495e; }
+.order-details ul { list-style: none; padding: 0; margin: 0 0 1rem 0; }
+.order-details li { padding: 0.4rem 0; color: #555; }
+.order-total { text-align: right; font-size: 1.1rem; font-weight: bold; color: #2c3e50; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #ecf0f1; }
+
+.feedback-message {
+  padding: 1rem;
+  border-radius: 5px;
+  margin: 0 auto 1.5rem auto;
+  max-width: 800px;
+  text-align: center;
+}
+
+.feedback-message.error { background-color: #f8d7da; color: #721c24; }
+.feedback-message.info { background-color: #d1ecf1; color: #0c5460; }
+
+.btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.btn-secondary { background-color: #95a5a6; color: white; }

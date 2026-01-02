@@ -1,0 +1,87 @@
+<div class="management-container">
+  <header>
+    <button (click)="goBack()" class="btn btn-secondary">&larr; Back to Dashboard</button>
+    <h1>Manage Staff</h1>
+    <p>Create staff accounts and manage roles (Kitchen, Cashier, Admin).</p>
+  </header>
+
+  <div *ngIf="feedbackMessage" class="feedback-message success">{{ feedbackMessage }}</div>
+  <div *ngIf="errorMessage" class="feedback-message error">{{ errorMessage }}</div>
+
+  <div class="content-grid">
+    <section class="card">
+      <h2 class="card-header">All Staff</h2>
+      <div class="card-content">
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of staff">
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                  <select [value]="user.role" (change)="onRoleChange(user, $event)" class="role-select" [disabled]="user.role === 'ROLE_ADMIN'">
+                    <option *ngFor="let role of availableRoles" [value]="role">{{ role.replace('ROLE_', '') }}</option>
+                  </select>
+                </td>
+                <td class="actions-cell">
+                  <button class="btn btn-danger btn-sm" (click)="onDeleteStaff(user)">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card-header">Create New Staff Member</h2>
+      <div class="card-content">
+        <form [formGroup]="createUserForm" (ngSubmit)="onCreateStaff()" class="modern-form">
+          <div class="form-field">
+            <label for="name">Name</label>
+            <input id="name" type="text" formControlName="name" placeholder="e.g., Jane Smith">
+          </div>
+          <div class="form-field">
+            <label for="email">Email</label>
+            <input id="email" type="email" formControlName="email" placeholder="e.g., staff@example.com">
+          </div>
+          <div class="form-field">
+            <label for="password">Password</label>
+            <input id="password" type="password" formControlName="password" placeholder="Min 6 characters">
+          </div>
+          <div class="form-field">
+            <label for="role">Role</label>
+            <select id="role" formControlName="role">
+              <option *ngFor="let role of availableRoles" [value]="role">{{ role.replace('ROLE_', '') }}</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary" [disabled]="createUserForm.invalid">Create Staff</button>
+        </form>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- OTP Modal for Admin Promotion -->
+<div class="modal-overlay" *ngIf="showOtpModal">
+  <div class="modal-content">
+    <h3>Complete Admin Promotion</h3>
+    <p>An OTP has been sent to your registered email address. Please enter it below to confirm the promotion of <strong>{{ userToPromote?.name }}</strong>.</p>
+    <div class="form-field">
+      <label for="otp-promo">One-Time Password (OTP)</label>
+      <input id="otp-promo" type="text" [(ngModel)]="otpForPromotion" placeholder="Enter OTP">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" (click)="closeOtpModal()">Cancel</button>
+      <button class="btn btn-primary" (click)="onCompletePromotion()" [disabled]="!otpForPromotion">Confirm Promotion</button>
+    </div>
+  </div>
+</div>
