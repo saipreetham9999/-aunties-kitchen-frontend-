@@ -7,7 +7,8 @@ import { tap } from 'rxjs/operators'; // Import tap for side effects
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:8080/api/auth'; // Adjust if your backend URL is different
+  private baseUrl = 'http://localhost:8080/api/auth';
+  private userKey = 'currentUser'; // Key for storing user data in localStorage
 
   constructor(private http: HttpClient) { }
 
@@ -25,7 +26,12 @@ export class AuthService {
     console.log('AuthService: Logging in user. Sending credentials:', credentials);
     return this.http.post(`${this.baseUrl}/login`, credentials).pipe(
       tap(
-        response => console.log('AuthService: Login successful. Response:', response),
+        (response: any) => {
+          console.log('AuthService: Login successful. Response:', response);
+          if (response && response.user) { // Assuming the backend returns a 'user' object
+            this.saveUser(response.user);
+          }
+        },
         error => console.error('AuthService: Login failed. Error:', error)
       )
     );
@@ -49,5 +55,24 @@ export class AuthService {
         error => console.error('AuthService: Resend OTP failed. Error:', error)
       )
     );
+  }
+
+  // New methods for user management
+  private saveUser(user: any): void {
+    localStorage.setItem(this.userKey, JSON.stringify(user));
+  }
+
+  getUser(): any | null {
+    const userJson = localStorage.getItem(this.userKey);
+    return userJson ? JSON.parse(userJson) : null;
+  }
+
+  getUserRole(): string | null {
+    const user = this.getUser();
+    return user && user.role ? user.role : null;
+  }
+
+  logout(): void {
+    localStorage.removeItem(this.userKey);
   }
 }

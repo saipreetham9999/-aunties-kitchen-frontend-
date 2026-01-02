@@ -1,0 +1,39 @@
+<div class="customer-dashboard-container">
+  <h2>Welcome to Your Customer Dashboard!</h2>
+  <p>Here you can view your orders and their statuses.</p>
+
+  <div class="orders-section">
+    <h3>Your Orders</h3>
+
+    <div *ngIf="errorMessage" class="error-message">
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <div *ngIf="!errorMessage && orders.length === 0" class="no-orders-message">
+      <p>No orders found yet. Start ordering!</p>
+    </div>
+
+    <div *ngIf="!errorMessage && orders.length > 0" class="order-list">
+      <div *ngFor="let order of orders" class="order-card">
+        <div class="order-header">
+          <span class="order-id">Order #{{ order.id }}</span>
+          <span class="order-date">{{ order.date }}</span>
+        </div>
+        <div class="order-status status-{{ order.status.toLowerCase().replace(' ', '-') }}">
+          Status: {{ order.status }}
+        </div>
+        <div class="order-details">
+          <h4>Items:</h4>
+          <ul>
+            <li *ngFor="let item of order.items">
+              {{ item.quantity }} x {{ item.name }} - ${{ item.price | number:'1.2-2' }}
+            </li>
+          </ul>
+          <div class="order-total">
+            <strong>Total: ${{ order.total | number:'1.2-2' }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

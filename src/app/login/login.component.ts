@@ -44,7 +44,15 @@ export class LoginComponent implements OnInit {
         this.message = response.message || 'Login successful!';
         // In a real app, you'd store the token (response.accessToken) here
         // localStorage.setItem('accessToken', response.accessToken);
-        this.router.navigate(['/home']); // Navigate to home/dashboard on success
+
+        const userRole = this.authService.getUserRole();
+        console.log('User role after login:', userRole);
+
+        if (userRole === 'CUSTOMER') {
+          this.router.navigate(['/customer-dashboard']); // Redirect customer to their dashboard
+        } else {
+          this.router.navigate(['/home']); // Default redirect for other roles or if role is not found
+        }
       },
       error: (error) => {
         console.error('Login error:', error);
