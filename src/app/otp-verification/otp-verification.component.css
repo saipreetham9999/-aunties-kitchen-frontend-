@@ -1,0 +1,142 @@
+.otp-verification-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh; /* Adjusted for header */
+  font-family: Arial, sans-serif;
+  background-color: #f4f7f6;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+h2 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 2em;
+  font-weight: bold;
+}
+
+p {
+  margin-bottom: 15px;
+  font-size: 1.1em;
+  color: #555;
+  text-align: center;
+}
+
+p strong {
+  color: #007bff;
+}
+
+form {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: #555;
+  font-weight: bold;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 1.2em;
+  text-align: center;
+  letter-spacing: 5px; /* Spacing for OTP digits */
+  transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1.1em;
+  width: 100%;
+  margin-top: 15px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+button:disabled {
+  background-color: #a0c7ed;
+  cursor: not-allowed;
+}
+
+.otp-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+.otp-actions button {
+  background-color: #6c757d; /* Grey for resend */
+  margin-top: 10px;
+}
+
+.otp-actions button:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
+.otp-actions p {
+  margin-top: 15px;
+  font-size: 0.95em;
+}
+
+.otp-actions a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.otp-actions a:hover {
+  text-decoration: underline;
+}
+
+.feedback-message {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #e9f7ef;
+  color: #28a745;
+  border: 1px solid #28a745;
+  text-align: center;
+  font-weight: bold;
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}

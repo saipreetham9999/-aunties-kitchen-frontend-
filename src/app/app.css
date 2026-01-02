@@ -1,0 +1,57 @@
+/* Global Styles */
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f4f7f6;
+  color: #333;
+}
+
+.app-header {
+  background-color: #FFD700; /* Yellow background for the header */
+  color: #333;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.app-logo-image {
+  height: 40px; /* Adjust as needed */
+  margin-right: 10px;
+}
+
+.app-logo-text {
+  font-size: 1.8em;
+  font-weight: bold;
+  color: #333; /* Dark text for contrast on yellow */
+  text-decoration: none;
+}
+
+.app-nav a {
+  color: #333;
+  text-decoration: none;
+  margin-left: 20px;
+  font-size: 1.1em;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.app-nav a:hover,
+.app-nav a.active {
+  color: #007bff; /* Highlight active/hovered link */
+}
+
+.app-content {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: calc(100vh - 80px); /* Adjust based on header height */
+}
