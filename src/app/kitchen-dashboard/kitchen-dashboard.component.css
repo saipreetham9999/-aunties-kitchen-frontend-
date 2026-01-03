@@ -1,8 +1,9 @@
-/* Main container and header styling */
 .kitchen-dashboard-container {
   padding: 2rem;
-  background-color: #e9ebee; /* Light grey background for contrast */
+  background-color: #f4f7f6;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 header {
@@ -21,112 +22,57 @@ header p {
   color: #7f8c8d;
 }
 
-/* Grid for order tickets */
-.order-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-/* Order ticket styling */
-.order-ticket {
+.order-list-container {
   background: #ffffff;
-  border: 1px solid #d1d5da;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
 }
 
-.ticket-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  border-bottom: 2px dashed #d1d5da;
+.order-list-container h2 {
+  font-size: 1.5rem;
+  color: #34495e;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
 }
 
-.order-id {
-  font-weight: bold;
-  font-size: 1.1rem;
-  color: #333;
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
 }
 
-.order-status {
-  padding: 0.3rem 0.8rem;
-  border-radius: 15px;
-  font-size: 0.8rem;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
-/* Status colors */
-.status-new { background-color: #eaf2f8; color: #3498db; }
-.status-in_progress { background-color: #fef9e7; color: #f39c12; }
-.status-ready { background-color: #d4edda; color: #28a745; }
-
-.ticket-body {
+.order-table th, .order-table td {
   padding: 1rem;
-  flex-grow: 1; /* Allows body to take up available space */
+  border-bottom: 1px solid #ecf0f1;
+  vertical-align: middle;
 }
 
-.item-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.item-list li {
-  display: flex;
-  align-items: center;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.item-list li:last-child {
-  border-bottom: none;
-}
-
-.item-list .quantity {
-  font-weight: bold;
-  font-size: 1.2rem;
-  color: #e74c3c;
-  margin-right: 1rem;
-  min-width: 30px;
-}
-
-.item-list .name {
-  font-size: 1rem;
+.order-table th {
+  background-color: #f9fafb;
+  font-weight: 600;
   color: #34495e;
 }
 
-.ticket-actions {
-  padding: 1rem;
-  border-top: 1px solid #f0f0f0;
-  background-color: #f9fafb;
-  text-align: center;
+.order-table tbody tr:hover {
+  background-color: #f4f7f6;
 }
 
-.ready-message {
-  font-weight: bold;
-  color: #28a745;
-  font-size: 1.1rem;
+.status-dropdown {
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid #bdc3c7;
+  font-size: 0.9rem;
 }
 
-/* Button styling */
 .btn {
-  width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  transition: background-color 0.3s, transform 0.2s;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
+  transition: background-color 0.2s;
 }
 
 .btn-primary {
@@ -134,32 +80,6 @@ header p {
   color: white;
 }
 
-.btn-success {
-  background-color: #2ecc71;
-  color: white;
-}
-
-/* Feedback messages */
-.feedback-message {
-  padding: 1rem;
-  border-radius: 5px;
-  margin: 0 auto 1.5rem auto;
-  max-width: 800px;
-  text-align: center;
-  font-weight: 500;
-}
-
-.feedback-message.success {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.feedback-message.error {
-  background-color: #f8d7da;
-  color: #721c24;
-}
-
-.feedback-message.info {
-  background-color: #d1ecf1;
-  color: #0c5460;
+.btn-primary:hover {
+  background-color: #2980b9;
 }

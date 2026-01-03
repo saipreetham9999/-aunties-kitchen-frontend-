@@ -4,15 +4,17 @@ import { Observable, throwError } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 
 export interface OrderItem {
-  name: string;
+  menuItemId: string;
+  menuItemName: string;
   quantity: number;
   price: number;
 }
 
 export interface Order {
   id: string;
+  customerName?: string; // Optional customer name
   date: string;
-  status: 'NEW' | 'IN_PROGRESS' | 'READY' | 'COMPLETED' | 'CANCELLED';
+  status: 'PENDING' | 'CONFIRMED' | 'PREPARING' | 'READY_FOR_PICKUP' | 'COMPLETED' | 'CANCELLED';
   total: number;
   items: OrderItem[];
 }
@@ -22,7 +24,7 @@ export interface Order {
 })
 export class OrderService {
   private apiUrl = 'http://localhost:8080/api/orders';
-  private adminApiUrl = 'http://localhost:8080/api/admin/orders'; // New base URL for this specific feature
+  private adminApiUrl = 'http://localhost:8080/api/admin/orders';
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
@@ -50,7 +52,7 @@ export class OrderService {
   getAllOrders(): Observable<Order[]> {
     try {
       const headers = this.createAuthHeaders();
-      return this.http.get<Order[]>(`${this.apiUrl}/admin/all`, { headers });
+      return this.http.get<Order[]>(this.adminApiUrl, { headers });
     } catch (error) {
       return throwError(() => error);
     }
@@ -66,21 +68,21 @@ export class OrderService {
     }
   }
 
-  // For ROLE_KITCHEN
-  getKitchenOrders(): Observable<Order[]> {
+  // For ROLE_KITCHEN/ADMIN to update status
+  updateOrderStatus(orderId: string, status: string): Observable<Order> {
     try {
       const headers = this.createAuthHeaders();
-      return this.http.get<Order[]>(`${this.apiUrl}/kitchen`, { headers });
+      return this.http.put<Order>(`${this.adminApiUrl}/${orderId}/status`, { status }, { headers });
     } catch (error) {
       return throwError(() => error);
     }
   }
 
-  // For ROLE_KITCHEN to update status
-  updateOrderStatus(orderId: string, status: string): Observable<any> {
+  // For ROLE_CASHIER to create a new order
+  createOrder(orderData: { items: { menuItemId: string, quantity: number }[], total: number }): Observable<Order> {
     try {
       const headers = this.createAuthHeaders();
-      return this.http.put(`${this.apiUrl}/${orderId}/status`, { status }, { headers });
+      return this.http.post<Order>(this.apiUrl, orderData, { headers });
     } catch (error) {
       return throwError(() => error);
     }

@@ -1,0 +1,39 @@
+<div class="dashboard-container">
+  <header>
+    <button (click)="goBack()" class="btn btn-secondary">&larr; Back to Dashboard</button>
+    <h1>Kitchen Dashboard</h1>
+    <p>Live order status management for the kitchen staff.</p>
+  </header>
+
+  <div *ngIf="feedbackMessage" class="feedback-message success">{{ feedbackMessage }}</div>
+  <div *ngIf="errorMessage" class="feedback-message error">{{ errorMessage }}</div>
+
+  <div class="orders-grid">
+    <div class="card" *ngFor="let order of orders">
+      <div class="card-header">
+        <h3>Order #{{ order.id?.substring(0, 8) }}</h3>
+        <span class="customer-name">{{ order.customerName || 'N/A' }}</span>
+      </div>
+      <div class="card-content">
+        <ul class="order-items">
+          <li *ngFor="let item of order.items">
+            {{ item.menuItemName }} - x{{ item.quantity }}
+          </li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="status-control">
+          <label for="status-{{order.id}}">Status:</label>
+          <select id="status-{{order.id}}" [(ngModel)]="order.status" class="status-dropdown">
+            <option *ngFor="let status of orderStatuses" [value]="status">{{ status }}</option>
+          </select>
+          <button (click)="onUpdateStatus(order, order.status)" class="btn btn-primary btn-sm">Update</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="orders.length === 0" class="no-orders-message">
+    <p>No active orders at the moment.</p>
+  </div>
+</div>

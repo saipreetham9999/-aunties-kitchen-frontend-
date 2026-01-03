@@ -24,7 +24,7 @@
         <h4>Items:</h4>
         <ul>
           <li *ngFor="let item of order.items">
-            {{ item.quantity }} x {{ item.name }} - {{ item.price | currency }}
+            {{ item.quantity }} x {{ item.menuItemName }} - {{ item.price | currency }}
           </li>
         </ul>
         <div class="order-total">

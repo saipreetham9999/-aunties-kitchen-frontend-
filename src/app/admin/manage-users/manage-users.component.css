@@ -3,6 +3,9 @@
   padding: 2rem;
   background-color: #f4f7f6;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  width: 100%; /* Ensure it takes full available width */
+  max-width: 1200px; /* Set a reasonable max-width */
+  margin: 0 auto; /* Center the container */
 }
 
 header {
@@ -28,10 +31,27 @@ header .btn-secondary {
   left: 0;
 }
 
-.toggle-button {
-  margin-top: 1rem;
-  padding: 0.75rem 1.5rem;
+.button-group {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.search-group {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-group input {
+  padding: 0.75rem;
+  border: 1px solid #bdc3c7;
+  border-radius: 5px;
   font-size: 1rem;
+  width: 300px;
 }
 
 .content-sections {
@@ -42,17 +62,7 @@ header .btn-secondary {
 
 .content-sections .card {
   width: 100%; /* Take full width when only one is visible */
-  max-width: 1400px; /* Max width for content */
 }
-
-/* Original content-grid is no longer needed for this component's main layout */
-/* .content-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-} */
 
 .card {
   background: #ffffff;
@@ -141,46 +151,6 @@ header .btn-secondary {
 .actions-cell {
   display: flex;
   gap: 0.5rem;
-}
-
-.modern-form {
-  display: grid;
-  gap: 1rem;
-}
-
-.form-field {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-field label {
-  font-weight: 600;
-  margin-bottom: 0.4rem;
-  color: #34495e;
-}
-
-.form-field input, .form-field select {
-  padding: 0.75rem;
-  border: 1px solid #bdc3c7;
-  border-radius: 5px;
-  font-size: 1rem;
-}
-
-.form-field-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.form-field-checkbox label {
-  margin-bottom: 0;
-  font-weight: normal;
-}
-
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
 }
 
 .btn {

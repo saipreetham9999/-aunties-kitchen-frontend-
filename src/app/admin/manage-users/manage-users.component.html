@@ -3,10 +3,14 @@
     <button (click)="goBack()" class="btn btn-secondary">&larr; Back to Dashboard</button>
     <h1>Manage Users</h1>
     <p>Create, verify, and manage customer accounts.</p>
-    <button (click)="toggleCreateUserSection()" class="btn btn-primary toggle-button">
-      <span *ngIf="!showCreateUserSection">Create New Customer</span>
-      <span *ngIf="showCreateUserSection">View All Customers</span>
-    </button>
+    <div class="button-group">
+      <button (click)="onDisplayUsers()" class="btn btn-primary">Display Users</button>
+      <button routerLink="/register" class="btn btn-primary">Create New Customer</button>
+    </div>
+    <div class="search-group">
+      <input type="text" [(ngModel)]="searchEmail" placeholder="Search by Email">
+      <button (click)="onSearchUsers()" class="btn btn-primary">Search</button>
+    </div>
   </header>
 
   <div *ngIf="feedbackMessage" class="feedback-message success">{{ feedbackMessage }}</div>
@@ -14,7 +18,7 @@
 
   <div class="content-sections">
     <!-- Display All Customers Section -->
-    <section class="card" *ngIf="!showCreateUserSection">
+    <section class="card" *ngIf="showUserList">
       <h2 class="card-header">All Customers</h2>
       <div class="card-content">
         <div class="table-container">
@@ -46,28 +50,6 @@
             </tbody>
           </table>
         </div>
-      </div>
-    </section>
-
-    <!-- Create New Customer Section -->
-    <section class="card" *ngIf="showCreateUserSection">
-      <h2 class="card-header">Create New Customer</h2>
-      <div class="card-content">
-        <form [formGroup]="createUserForm" (ngSubmit)="onCreateUser()" class="modern-form">
-          <div class="form-field">
-            <label for="name">Name</label>
-            <input id="name" type="text" formControlName="name" placeholder="e.g., John Doe">
-          </div>
-          <div class="form-field">
-            <label for="email">Email</label>
-            <input id="email" type="email" formControlName="email" placeholder="e.g., user@example.com">
-          </div>
-          <div class="form-field">
-            <label for="password">Password</label>
-            <input id="password" type="password" formControlName="password" placeholder="Min 6 characters">
-          </div>
-          <button type="submit" class="btn btn-primary" [disabled]="createUserForm.invalid">Create Customer</button>
-        </form>
       </div>
     </section>
   </div>
