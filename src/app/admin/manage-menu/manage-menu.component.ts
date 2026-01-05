@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { MenuService, MenuItem } from '../../menu/menu.service';
 
 @Component({
   selector: 'app-manage-menu',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule], // Removed unused RouterLink
   templateUrl: './manage-menu.component.html',
   styleUrls: ['../manage-users/manage-users.component.css']
 })
@@ -28,7 +28,7 @@ export class ManageMenuComponent implements OnInit {
       name: ['', Validators.required],
       price: ['', [Validators.required, Validators.min(0.01)]],
       category: ['Main Course', Validators.required],
-      isActive: [true, Validators.required]
+      isAvailable: [true, Validators.required]
     });
   }
 
@@ -69,7 +69,7 @@ export class ManageMenuComponent implements OnInit {
   onUpdateMenuItem(): void {
     if (!this.editingItem) return;
     const updatedData = { ...this.editingItem, ...this.menuItemForm.value };
-    this.menuService.updateMenuItem(updatedData).subscribe({
+    this.menuService.updateMenuItem(this.editingItem.id, updatedData).subscribe({
       next: (updatedItem) => {
         this.showFeedback(`Menu item "${updatedItem.name}" updated.`);
         const index = this.menuItems.findIndex(item => item.id === updatedItem.id);
@@ -103,7 +103,7 @@ export class ManageMenuComponent implements OnInit {
     this.editingItem = null;
     this.menuItemForm.reset({
       category: 'Main Course',
-      isActive: true
+      isAvailable: true
     });
   }
 

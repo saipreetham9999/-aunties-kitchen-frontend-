@@ -29,7 +29,7 @@
                 <td>{{ item.category }}</td>
                 <td>{{ item.price | currency }}</td>
                 <td>
-                  <span class="status-badge" [class.active]="item.isActive">{{ item.isActive ? 'Active' : 'Inactive' }}</span>
+                  <span class="status-badge" [class.active]="item.isAvailable">{{ item.isAvailable ? 'Available' : 'Unavailable' }}</span>
                 </td>
                 <td class="actions-cell">
                   <button class="btn btn-secondary btn-sm" (click)="onEdit(item)">Edit</button>
@@ -59,8 +59,8 @@
             <input id="category" type="text" formControlName="category" placeholder="e.g., Main Course">
           </div>
           <div class="form-field-checkbox">
-            <input id="isActive" type="checkbox" formControlName="isActive">
-            <label for="isActive">Is Active</label>
+            <input id="isAvailable" type="checkbox" formControlName="isAvailable">
+            <label for="isAvailable">Is Available</label>
           </div>
           <div class="form-actions">
             <button type="submit" class="btn btn-primary" [disabled]="menuItemForm.invalid">

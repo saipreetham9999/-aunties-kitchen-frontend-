@@ -1,64 +1,58 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { UserService, User } from '../user.service';
-import { AuthService } from '../../auth/auth.service'; // Import AuthService
 
 @Component({
   selector: 'app-manage-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './manage-users.component.html',
   styleUrls: ['./manage-users.component.css']
 })
 export class ManageUsersComponent implements OnInit {
 
   customers: User[] = [];
-  allCustomers: User[] = []; // To store the full list of customers for searching
-  userOtps: { [key: string]: string } = {};
+  private allCustomers: User[] = []; // Private store of all customers
+
+  isLoading = false;
   feedbackMessage: string | null = null;
   errorMessage: string | null = null;
 
-  showUserList: boolean = false; // Controls visibility of the user list section
-  searchEmail: string = ''; // Binds to the search input field
+  searchEmail: string = '';
 
   constructor(
     private userService: UserService,
-    private authService: AuthService, // Inject AuthService
-    private fb: FormBuilder, // Keep FormBuilder for potential future use or if other forms exist
     private router: Router
-  ) {
-    // createUserForm is no longer needed here as creation is handled by navigation to /register
-  }
+  ) { }
 
   ngOnInit(): void {
-    // No initial load, users will be loaded when 'Display Users' is clicked
-  }
-
-  loadUsers(): void {
-    this.userService.getUsers().subscribe({
-      next: (data) => {
-         console.log('Raw data received from backend:', data);
-        // FIX: Change filter condition from 'ROLE_CUSTOMER' to 'CUSTOMER'
-        this.allCustomers = data.filter(u => u.role === 'CUSTOMER');
-        console.log('Filtered customers:', this.allCustomers);
-        this.customers = [...this.allCustomers]; // Display all customers initially
-
-      },
-      error: (err) => this.handleError('Failed to load users.')
-    });
-  }
-
-  onDisplayUsers(): void {
-    this.showUserList = true;
-    this.searchEmail = ''; // Clear search when displaying all
     this.loadUsers();
   }
 
-  onSearchUsers(): void {
+  loadUsers(): void {
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.userService.getUsers().subscribe({
+      next: (data) => {
+        this.allCustomers = data.filter(u => u.role === 'ROLE_CUSTOMER');
+        this.customers = [...this.allCustomers]; // Refresh the displayed list
+        this.isLoading = false;
+        if (this.customers.length === 0) {
+          this.showFeedback('No customer accounts found.');
+        }
+      },
+      error: (err: any) => {
+        this.handleError('Failed to load users.');
+        this.isLoading = false;
+      }
+    });
+  }
+
+  onSearch(): void {
     if (this.searchEmail.trim() === '') {
-      this.customers = [...this.allCustomers]; // If search is empty, show all
+      this.customers = [...this.allCustomers];
     } else {
       this.customers = this.allCustomers.filter(user =>
         user.email.toLowerCase().includes(this.searchEmail.toLowerCase())
@@ -66,34 +60,16 @@ export class ManageUsersComponent implements OnInit {
     }
   }
 
-  onVerifyUser(user: User): void {
-    const otp = this.userOtps[user.id];
-    if (!otp) {
-      this.handleError('Please enter the OTP.');
-      return;
-    }
-    this.userService.verifyUserOtp(user.email, otp).subscribe({
-      next: (response) => {
-        this.showFeedback(response.message || `User ${user.name} verified.`);
-        // Update the status in both lists
-        const verifiedUserInCustomers = this.customers.find(u => u.id === user.id);
-        if (verifiedUserInCustomers) verifiedUserInCustomers.emailVerified = true;
-        const verifiedUserInAllCustomers = this.allCustomers.find(u => u.id === user.id);
-        if (verifiedUserInAllCustomers) verifiedUserInAllCustomers.emailVerified = true;
-      },
-      error: (err) => this.handleError(err.error?.message || 'Invalid OTP.')
-    });
-  }
-
   onDeleteUser(user: User): void {
-    if (confirm(`Are you sure you want to delete the customer ${user.name}?`)) {
+    if (confirm(`Are you sure you want to delete the customer ${user.name}? This action cannot be undone.`)) {
       this.userService.deleteUser(user.id).subscribe({
         next: () => {
           this.showFeedback(`Customer ${user.name} has been deleted.`);
+          // Remove from both lists to keep them in sync
+          this.allCustomers = this.allCustomers.filter(u => u.id !== user.id);
           this.customers = this.customers.filter(u => u.id !== user.id);
-          this.allCustomers = this.allCustomers.filter(u => u.id !== user.id); // Also remove from allCustomers
         },
-        error: (err) => this.handleError(`Failed to delete user.`)
+        error: (err: any) => this.handleError(`Failed to delete user.`)
       });
     }
   }
@@ -102,13 +78,17 @@ export class ManageUsersComponent implements OnInit {
     this.router.navigate(['/admin/orders/user', user.id]);
   }
 
+  navigateToCreateStaff(): void {
+    this.router.navigate(['/admin/staff']);
+  }
+
   goBack(): void {
     this.router.navigate(['/admin-dashboard']);
   }
 
   private showFeedback(message: string): void {
     this.feedbackMessage = message;
-    setTimeout(() => this.feedbackMessage = null, 3000);
+    setTimeout(() => this.feedbackMessage = null, 4000);
   }
 
   private handleError(message: string): void {

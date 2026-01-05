@@ -2,55 +2,60 @@
   <header>
     <button (click)="goBack()" class="btn btn-secondary">&larr; Back to Dashboard</button>
     <h1>Manage Users</h1>
-    <p>Create, verify, and manage customer accounts.</p>
-    <div class="button-group">
-      <button (click)="onDisplayUsers()" class="btn btn-primary">Display Users</button>
-      <button routerLink="/register" class="btn btn-primary">Create New Customer</button>
-    </div>
-    <div class="search-group">
-      <input type="text" [(ngModel)]="searchEmail" placeholder="Search by Email">
-      <button (click)="onSearchUsers()" class="btn btn-primary">Search</button>
-    </div>
+    <p>View customer accounts and their order history.</p>
   </header>
 
   <div *ngIf="feedbackMessage" class="feedback-message success">{{ feedbackMessage }}</div>
   <div *ngIf="errorMessage" class="feedback-message error">{{ errorMessage }}</div>
 
-  <div class="content-sections">
-    <!-- Display All Customers Section -->
-    <section class="card" *ngIf="showUserList">
-      <h2 class="card-header">All Customers</h2>
-      <div class="card-content">
-        <div class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let user of customers">
-                <td>{{ user.name }}</td>
-                <td>{{ user.email }}</td>
-                <td>
-                  <div *ngIf="user.emailVerified" class="status-badge verified">Verified</div>
-                  <div *ngIf="!user.emailVerified" class="otp-verify-cell">
-                    <input type="text" class="otp-input" placeholder="OTP" [(ngModel)]="userOtps[user.id]">
-                    <button class="btn btn-success btn-sm" (click)="onVerifyUser(user)">Verify</button>
-                  </div>
-                </td>
-                <td class="actions-cell">
-                  <button class="btn btn-secondary btn-sm" (click)="onViewOrders(user)">Orders</button>
-                  <button class="btn btn-danger btn-sm" (click)="onDeleteUser(user)">Delete</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+  <div class="card">
+    <div class="card-header">
+      <h2>All Customers</h2>
+      <div class="header-actions">
+        <input
+          type="text"
+          [(ngModel)]="searchEmail"
+          (input)="onSearch()"
+          placeholder="Search by email..."
+          class="search-input"
+        />
+        <button (click)="navigateToCreateStaff()" class="btn btn-primary">Create New Staff</button>
       </div>
-    </section>
+    </div>
+    <div class="card-content">
+      <div *ngIf="isLoading" class="loading-spinner">
+        <p>Loading users...</p>
+      </div>
+      <div *ngIf="!isLoading && customers.length > 0" class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Verified</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of customers">
+              <td>{{ user.name }}</td>
+              <td>{{ user.email }}</td>
+              <td>
+                <span class="status-badge" [class.active]="user.emailVerified">
+                  {{ user.emailVerified ? 'Yes' : 'No' }}
+                </span>
+              </td>
+              <td class="actions-cell">
+                <button class="btn btn-secondary btn-sm" (click)="onViewOrders(user)">View Orders</button>
+                <button class="btn btn-danger btn-sm" (click)="onDeleteUser(user)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="!isLoading && customers.length === 0 && !errorMessage" class="empty-state">
+        <p>No customers match your search or none exist.</p>
+      </div>
+    </div>
   </div>
 </div>

@@ -1,59 +1,112 @@
-# AuntiesKitchenFrontend
+# Auntie's Kitchen Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.4.
+This project is the frontend for the "Auntie's Kitchen" application, a comprehensive platform for managing restaurant operations. It includes features for customers, kitchen staff, cashiers, and administrators.
 
-## Development server
+## Table of Contents
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Running the Application](#running-the-application)
+- [Key Functionality](#key-functionality)
+- [Contributing](#contributing)
 
-To start a local development server, run:
+## Features
 
-```bash
-ng serve
+*   **User Authentication:** Secure login, registration, and OTP verification.
+*   **Customer Dashboard:** Allows customers to view menus and place orders.
+*   **Admin Dashboard:** Provides administrators with tools to manage users, staff, menus, and orders.
+*   **Kitchen Dashboard:** A dedicated view for kitchen staff to manage incoming orders.
+*   **Cashier Dashboard:** A dedicated view for cashiers to handle payments and orders.
+*   **Role-Based Access Control:** Different dashboards and functionalities based on user roles (customer, admin, kitchen, cashier).
+
+## Technologies Used
+
+*   **Angular:** A powerful framework for building dynamic single-page applications.
+*   **TypeScript:** A typed superset of JavaScript that enhances code quality and maintainability.
+*   **RxJS:** A library for reactive programming using Observables, used for managing asynchronous operations.
+*   **HTML & CSS:** For structuring and styling the application.
+
+## Project Structure
+
+The project follows a standard Angular CLI structure:
+
+```
+/
+├── src/
+│   ├── app/
+│   │   ├── admin/             # Components for the admin dashboard
+│   │   ├── auth/              # Services for authentication
+│   │   ├── customer-dashboard/ # Components for the customer view
+│   │   ├── kitchen-dashboard/ # Components for the kitchen view
+│   │   ├── cashier-dashboard/ # Components for the cashier view
+│   │   ├── login/             # Login component
+│   │   ├── register/          # Registration component
+│   │   ├── otp-verification/  # OTP verification component
+│   │   ├── orders/            # Components and services for managing orders
+│   │   ├── menu/              # Components and services for managing the menu
+│   │   ├── app.routes.ts      # Main application routing
+│   │   └── ...
+│   ├── assets/              # Static assets like images and styles
+│   └── ...
+├── angular.json             # Angular CLI configuration
+├── package.json             # Project dependencies and scripts
+└── ...
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Getting Started
 
-## Code scaffolding
+### Prerequisites
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+*   Node.js and npm (Node Package Manager)
+*   Angular CLI (`npm install -g @angular/cli`)
 
-```bash
-ng generate component component-name
-```
+### Installation
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+1.  Clone the repository:
+    ```sh
+    git clone <repository-url>
+    ```
+2.  Navigate to the project directory:
+    ```sh
+    cd aunties-kitchen-frontend
+    ```
+3.  Install the dependencies:
+    ```sh
+    npm install
+    ```
 
-```bash
-ng generate --help
-```
+### Running the Application
 
-## Building
+1.  Start the development server:
+    ```sh
+    ng serve
+    ```
+2.  Open your browser and navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
-To build the project run:
+## Key Functionality
 
-```bash
-ng build
-```
+The application is divided into several key functional areas based on user roles:
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+*   **/login, /register, /verify-otp:** Handles user authentication and onboarding.
+*   **/customer-dashboard:** The main view for customers to browse the menu and place orders.
+*   **/admin-dashboard:** The central hub for administrators, with access to:
+    *   **/admin/users:** Manage customer accounts.
+    *   **/admin/staff:** Manage staff accounts (kitchen, cashier).
+    *   **/admin/menu:** Add, edit, or remove menu items.
+    *   **/admin/orders:** View and manage all orders in the system.
+*   **/admin/kitchen-dashboard:** A specialized view for kitchen staff to see and update the status of orders.
+*   **/admin/cashier-dashboard:** A specialized view for cashiers to process payments.
 
-## Running unit tests
+## Contributing
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Contributions are welcome! Please follow these steps:
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+1.  Fork the repository.
+2.  Create a new branch (`git checkout -b feature/your-feature-name`).
+3.  Make your changes.
+4.  Commit your changes (`git commit -m 'Add some feature'`).
+5.  Push to the branch (`git push origin feature/your-feature-name`).
+6.  Open a Pull Request.

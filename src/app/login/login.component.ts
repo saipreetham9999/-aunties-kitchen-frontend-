@@ -41,6 +41,7 @@ export class LoginComponent implements OnInit {
         const userRole = this.authService.getUserRole();
         console.log('User role from AuthService:', userRole);
 
+        // Use the full role name from the JWT, including the 'ROLE_' prefix
         switch (userRole) {
           case 'ROLE_CUSTOMER':
             this.router.navigate(['/customer-dashboard']);

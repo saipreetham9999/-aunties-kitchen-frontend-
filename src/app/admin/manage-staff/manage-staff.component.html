@@ -27,12 +27,14 @@
                 <td>{{ user.name }}</td>
                 <td>{{ user.email }}</td>
                 <td>
-                  <select [value]="user.role" (change)="onRoleChange(user, $event)" class="role-select" [disabled]="user.role === 'ROLE_ADMIN'">
-                    <option *ngFor="let role of availableRoles" [value]="role">{{ role.replace('ROLE_', '') }}</option>
+                  <!-- The user.role from the backend includes the prefix (e.g., 'ROLE_ADMIN') -->
+                  <select [value]="user.role.replace('ROLE_', '')" (change)="onRoleChange(user, $event)" class="role-select" [disabled]="user.role === 'ROLE_ADMIN'">
+                    <!-- The value for the option should be the clean name for the update API -->
+                    <option *ngFor="let role of availableRolesForUpdate" [value]="role">{{ role }}</option>
                   </select>
                 </td>
                 <td class="actions-cell">
-                  <button class="btn btn-danger btn-sm" (click)="onDeleteStaff(user)">Delete</button>
+                  <button class="btn btn-danger btn-sm" (click)="onDeleteStaff(user)" [disabled]="user.role === 'ROLE_ADMIN'">Delete</button>
                 </td>
               </tr>
             </tbody>
@@ -60,7 +62,7 @@
           <div class="form-field">
             <label for="role">Role</label>
             <select id="role" formControlName="role">
-              <option *ngFor="let role of availableRoles" [value]="role">{{ role.replace('ROLE_', '') }}</option>
+              <option *ngFor="let role of availableRolesForUpdate" [value]="role">{{ role }}</option>
             </select>
           </div>
           <button type="submit" class="btn btn-primary" [disabled]="createUserForm.invalid">Create Staff</button>

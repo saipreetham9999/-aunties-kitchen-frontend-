@@ -1,66 +1,58 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { AuthService } from '../auth/auth.service';
 
 export interface MenuItem {
-  id?: string;
+  id: string;
   name: string;
+  description: string;
   price: number;
   category: string;
-  isActive: boolean;
+  imageUrl?: string;
+  isAvailable: boolean;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class MenuService {
-  private menuApiUrl = 'http://localhost:8080/api/menu';
+  private apiUrl = 'http://localhost:8080/api/menu';
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
-  private createAuthHeaders(): HttpHeaders {
+  private createAuthHeaders(): HttpHeaders | null {
     const token = this.authService.getToken();
-    if (!token) {
-      throw new Error('No authentication token found!');
-    }
-    return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
+    if (!token) return null;
+    return new HttpHeaders({ 'Authorization': `Bearer ${token}` });
   }
 
-  // GET: Fetch all menu items (Public)
+  private handleError(error: any) {
+    console.error('API Error:', error);
+    const message = error.error?.message || error.message || 'An unknown error occurred.';
+    return throwError(() => new Error(message));
+  }
+
   getMenuItems(): Observable<MenuItem[]> {
-    return this.http.get<MenuItem[]>(this.menuApiUrl);
+    return this.http.get<MenuItem[]>(this.apiUrl).pipe(catchError(this.handleError));
   }
 
-  // POST: Add a new item to the menu (Admin)
-  addMenuItem(item: MenuItem): Observable<MenuItem> {
-    try {
-      const headers = this.createAuthHeaders();
-      return this.http.post<MenuItem>(this.menuApiUrl, item, { headers });
-    } catch (error) {
-      return throwError(() => error);
-    }
+  addMenuItem(item: Omit<MenuItem, 'id'>): Observable<MenuItem> {
+    const headers = this.createAuthHeaders();
+    if (!headers) return throwError(() => new Error('No authentication token found.'));
+    return this.http.post<MenuItem>(this.apiUrl, item, { headers }).pipe(catchError(this.handleError));
   }
 
-  // PUT: Update an existing menu item (Admin)
-  updateMenuItem(item: MenuItem): Observable<MenuItem> {
-    try {
-      const headers = this.createAuthHeaders();
-      return this.http.put<MenuItem>(`${this.menuApiUrl}/${item.id}`, item, { headers });
-    } catch (error) {
-      return throwError(() => error);
-    }
+  updateMenuItem(id: string, item: Partial<MenuItem>): Observable<MenuItem> {
+    const headers = this.createAuthHeaders();
+    if (!headers) return throwError(() => new Error('No authentication token found.'));
+    return this.http.put<MenuItem>(`${this.apiUrl}/${id}`, item, { headers }).pipe(catchError(this.handleError));
   }
 
-  // DELETE: Remove an item from the menu (Admin)
-  deleteMenuItem(menuItemId: string): Observable<any> {
-    try {
-      const headers = this.createAuthHeaders();
-      return this.http.delete(`${this.menuApiUrl}/${menuItemId}`, { headers });
-    } catch (error) {
-      return throwError(() => error);
-    }
+  deleteMenuItem(id: string): Observable<any> {
+    const headers = this.createAuthHeaders();
+    if (!headers) return throwError(() => new Error('No authentication token found.'));
+    return this.http.delete(`${this.apiUrl}/${id}`, { headers }).pipe(catchError(this.handleError));
   }
 }

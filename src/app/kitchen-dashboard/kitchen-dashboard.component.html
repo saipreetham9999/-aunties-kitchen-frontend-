@@ -1,39 +1,45 @@
-<div class="kitchen-dashboard-container">
+<div class="dashboard-container">
   <header>
+    <button (click)="goBack()" class="btn btn-secondary" [disabled]="isLoading">&larr; Back to Dashboard</button>
     <h1>Kitchen Dashboard</h1>
-    <p>Live order status and management.</p>
+    <p>Live order status management for the kitchen staff.</p>
   </header>
 
-  <div class="order-list-container">
-    <h2>Current Orders</h2>
-    <table class="order-table">
-      <thead>
-        <tr>
-          <th>Order Number</th>
-          <th>Customer Name</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Order rows will be dynamically inserted here -->
-        <tr>
-          <td>#1001</td>
-          <td>John Doe</td>
-          <td>
-            <select class="status-dropdown">
-              <option value="PENDING">Pending</option>
-              <option value="IN_PROGRESS" selected>In Progress</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="CANCELLED">Cancelled</option>
-            </select>
-          </td>
-          <td>
-            <button class="btn btn-primary">Update</button>
-          </td>
-        </tr>
-        <!-- More example rows can be added for styling -->
-      </tbody>
-    </table>
+  <div *ngIf="feedbackMessage" class="feedback-message success">{{ feedbackMessage }}</div>
+  <div *ngIf="errorMessage" class="feedback-message error">{{ errorMessage }}</div>
+
+  <div *ngIf="isLoading" class="loading-spinner">
+    <p>Loading orders...</p>
+  </div>
+
+  <div *ngIf="!isLoading && orders.length > 0" class="orders-grid">
+    <div class="card" *ngFor="let order of orders">
+      <div class="card-header">
+        <h3>Order #{{ order.id.substring(0, 8) }}</h3>
+        <span class="customer-name">{{ order.customerName || 'N/A' }}</span>
+      </div>
+      <div class="card-content">
+        <ul class="order-items">
+          <li *ngFor="let item of order.items">
+            {{ item.menuItemName }} - x{{ item.quantity }}
+          </li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="status-control">
+          <label for="status-{{order.id}}">Status:</label>
+          <select id="status-{{order.id}}" [(ngModel)]="order.status" class="status-dropdown" [disabled]="updatingStatus[order.id]">
+            <option *ngFor="let status of orderStatuses" [value]="status">{{ status }}</option>
+          </select>
+          <button (click)="onUpdateStatus(order, order.status)" class="btn btn-primary btn-sm" [disabled]="updatingStatus[order.id]">
+            {{ updatingStatus[order.id] ? 'Updating...' : 'Update' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && orders.length === 0" class="no-orders-message">
+    <p>No active orders at the moment.</p>
   </div>
 </div>

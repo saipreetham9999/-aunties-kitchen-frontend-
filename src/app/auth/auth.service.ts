@@ -20,11 +20,19 @@ export class AuthService {
   login(credentials: any): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/login`, credentials).pipe(
       tap(response => {
-        if (response && response.token && response.role) {
-          this.saveAuthData(response.token, response.role);
-          console.log('AuthService: Login successful. Token and role saved.');
+        if (response && response.token) {
+          const decodedToken = this.decodeToken(response.token);
+          const role = decodedToken ? decodedToken.role : null;
+
+          if (role) {
+            this.saveAuthData(response.token, role);
+            console.log(`AuthService: Login successful. Role "${role}" found in token and saved.`);
+          } else {
+            console.error('AuthService: Login successful, but no role claim found in JWT.');
+            this.logout(); // Clear invalid auth state
+          }
         } else {
-          console.error('AuthService: Login failed. Invalid response from server.');
+          console.error('AuthService: Login failed. Server response did not include a token.');
         }
       })
     );
@@ -41,6 +49,18 @@ export class AuthService {
   private saveAuthData(token: string, role: string): void {
     localStorage.setItem(this.tokenKey, token);
     localStorage.setItem(this.roleKey, role);
+  }
+
+  private decodeToken(token: string): any | null {
+    try {
+      // A JWT is composed of three parts: header, payload, signature, separated by dots.
+      // The payload is the second part. It's a Base64-encoded JSON string.
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload;
+    } catch (e) {
+      console.error('Error decoding JWT', e);
+      return null;
+    }
   }
 
   getToken(): string | null {

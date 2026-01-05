@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { UserService, User } from '../user.service';
+import { Router } from '@angular/router';
+import { UserService, User, CleanRole } from '../user.service';
 
 @Component({
   selector: 'app-manage-staff',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule], // Removed unused RouterLink
   templateUrl: './manage-staff.component.html',
   styleUrls: ['../manage-users/manage-users.component.css']
 })
@@ -18,7 +18,8 @@ export class ManageStaffComponent implements OnInit {
   feedbackMessage: string | null = null;
   errorMessage: string | null = null;
 
-  availableRoles = ['ROLE_KITCHEN', 'ROLE_CASHIER', 'ROLE_ADMIN'];
+  // Clean roles are used for UI display and for sending updates to the backend.
+  availableRolesForUpdate: CleanRole[] = ['KITCHEN', 'CASHIER', 'ADMIN'];
 
   showOtpModal = false;
   userToPromote: User | null = null;
@@ -33,7 +34,7 @@ export class ManageStaffComponent implements OnInit {
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      role: ['ROLE_KITCHEN', Validators.required]
+      role: ['KITCHEN' as CleanRole, Validators.required]
     });
   }
 
@@ -44,9 +45,10 @@ export class ManageStaffComponent implements OnInit {
   loadStaff(): void {
     this.userService.getUsers().subscribe({
       next: (data) => {
+        // This comparison is now valid because the User interface expects the prefix.
         this.staff = data.filter(u => u.role !== 'ROLE_CUSTOMER');
       },
-      error: (err) => this.handleError('Failed to load staff members.')
+      error: (err: any) => this.handleError('Failed to load staff members.')
     });
   }
 
@@ -59,30 +61,30 @@ export class ManageStaffComponent implements OnInit {
       next: (newUser) => {
         this.showFeedback(`Staff member ${newUser.name} created.`);
         this.staff.push(newUser);
-        this.createUserForm.reset({ role: 'ROLE_KITCHEN' });
+        this.createUserForm.reset({ role: 'KITCHEN' });
       },
-      error: (err) => this.handleError(err.error?.message || 'Failed to create staff member.')
+      error: (err: any) => this.handleError(err.error?.message || 'Failed to create staff member.')
     });
   }
 
   onRoleChange(user: User, event: Event): void {
-    const newRole = (event.target as HTMLSelectElement).value;
-    if (newRole === 'ROLE_ADMIN') {
+    const newRole = (event.target as HTMLSelectElement).value as CleanRole;
+    if (newRole === 'ADMIN') {
       this.initiateAdminPromotion(user);
     } else {
       this.updateUserRole(user, newRole);
     }
   }
 
-  updateUserRole(user: User, newRole: string): void {
+  updateUserRole(user: User, newRole: CleanRole): void {
     this.userService.updateUserRole(user.id, newRole).subscribe({
       next: () => {
         this.showFeedback(`Role updated for ${user.name}.`);
-        this.updateUserInList(user.id, { role: newRole });
+        this.loadStaff(); // Reload to get the correct state from the server.
       },
-      error: (err) => {
+      error: (err: any) => {
         this.handleError(err.error?.message || 'Failed to update role.');
-        this.loadStaff();
+        this.loadStaff(); // Reload to reset the dropdown on failure.
       }
     });
   }
@@ -91,10 +93,10 @@ export class ManageStaffComponent implements OnInit {
     this.userToPromote = user;
     this.userService.initiateAdminPromotion(user.id).subscribe({
       next: (response) => {
-        this.showFeedback(response.message || 'OTP sent to your email.');
+        this.showFeedback(response.message || 'An OTP has been sent to the current admin\'s email for confirmation.');
         this.showOtpModal = true;
       },
-      error: (err) => {
+      error: (err: any) => {
         this.handleError(err.error?.message || 'Failed to initiate promotion.');
         this.loadStaff();
       }
@@ -106,10 +108,11 @@ export class ManageStaffComponent implements OnInit {
     this.userService.completeAdminPromotion(this.userToPromote.id, this.otpForPromotion).subscribe({
       next: (response) => {
         this.showFeedback(response.message || 'Promotion successful.');
+        // This assignment is now valid as the User interface expects the prefix.
         this.updateUserInList(this.userToPromote!.id, { role: 'ROLE_ADMIN' });
         this.closeOtpModal();
       },
-      error: (err) => this.handleError(err.error?.message || 'OTP verification failed.')
+      error: (err: any) => this.handleError(err.error?.message || 'OTP verification failed.')
     });
   }
 
@@ -127,7 +130,7 @@ export class ManageStaffComponent implements OnInit {
           this.showFeedback(`Staff member ${user.name} has been deleted.`);
           this.staff = this.staff.filter(u => u.id !== user.id);
         },
-        error: (err) => this.handleError('Failed to delete staff member.')
+        error: (err: any) => this.handleError('Failed to delete staff member.')
       });
     }
   }
