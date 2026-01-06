@@ -1,137 +1,148 @@
+:host {
+  display: block;
+  height: 100vh;
+  overflow: hidden; /* Prevent the whole page from scrolling */
+}
+
 .dashboard-container {
-  padding: 2rem;
-  background-color: #f4f7f6;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #f4f5f7; /* Lighter grey for a softer look */
 }
 
 header {
-  text-align: center;
-  margin-bottom: 2rem;
-  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  background-color: #ffffff;
+  border-bottom: 1px solid #dfe1e6;
+  flex-shrink: 0;
 }
 
 header h1 {
-  font-size: 2.5rem;
-  color: #2c3e50;
+  font-size: 1.75rem;
+  font-weight: 600;
   margin: 0;
 }
 
-header p {
-  font-size: 1.1rem;
-  color: #7f8c8d;
-}
-
-header .btn-secondary {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.orders-grid {
+/* Kanban Board Layout */
+.kanban-board {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+  flex-grow: 1;
+  overflow: hidden; /* Important for column scrolling */
 }
 
-.card {
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+.kanban-column {
   display: flex;
   flex-direction: column;
+  background-color: #ebecf0; /* Standard board color */
+  border-radius: 6px;
+  max-height: 100%;
 }
 
-.card-header {
-  background-color: #34495e;
-  color: white;
+.column-header {
   padding: 1rem;
+  flex-shrink: 0;
+}
+
+.column-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #42526e;
+}
+
+.column-body {
+  flex-grow: 1;
+  overflow-y: auto; /* Allow individual columns to scroll */
+  padding: 0 0.5rem 0.5rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Order Card Styling - More compact and clean */
+.order-card {
+  background-color: #ffffff;
+  border-radius: 5px;
+  box-shadow: 0 1px 2px rgba(9, 30, 66, 0.15);
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-left: 5px solid transparent; /* Status color indicator */
+}
+
+/* Column-specific card border colors */
+.pending-column .order-card { border-left-color: #fbbf24; }
+.confirmed-column .order-card { border-left-color: #60a5fa; }
+.preparing-column .order-card { border-left-color: #f87171; }
+.ready-column .order-card { border-left-color: #4ade80; }
+
+.card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0;
+  border: none;
 }
 
 .card-header h3 {
-  margin: 0;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #172b4d;
 }
 
-.customer-name {
-  font-size: 0.9rem;
-  font-style: italic;
-}
-
-.card-content {
-  padding: 1rem;
-  flex-grow: 1;
+.card-header span {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #5e6c84;
 }
 
 .order-items {
   list-style: none;
-  padding: 0;
+  padding: 0.5rem 0;
   margin: 0;
+  border-top: 1px solid #f4f5f7;
+  border-bottom: 1px solid #f4f5f7;
 }
 
 .order-items li {
-  padding: 0.25rem 0;
-  border-bottom: 1px solid #ecf0f1;
+  font-size: 0.95rem;
+  padding: 0.2rem 0;
+  display: flex;
+  justify-content: space-between;
 }
 
-.order-items li:last-child {
-  border-bottom: none;
+.item-name {
+  font-weight: 500;
+}
+
+.item-quantity {
+  font-weight: 700;
+  color: #007bff;
 }
 
 .card-footer {
-  padding: 1rem;
-  background-color: #f9fafb;
-  border-top: 1px solid #ecf0f1;
+  margin-top: auto;
 }
 
-.status-control {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.status-control label {
-  font-weight: 600;
-  color: #34495e;
-}
-
-.status-dropdown {
-  flex-grow: 1;
+.card-footer .btn {
+  width: 100%;
   padding: 0.5rem;
-  border: 1px solid #bdc3c7;
-  border-radius: 5px;
-}
-
-.no-orders-message {
-  text-align: center;
-  margin-top: 3rem;
-  font-size: 1.2rem;
-  color: #7f8c8d;
-}
-
-.feedback-message {
-  padding: 1rem;
-  border-radius: 5px;
-  margin: 0 auto 1.5rem auto;
-  max-width: 800px;
-  text-align: center;
-}
-
-.feedback-message.success { background-color: #d4edda; color: #155724; }
-.feedback-message.error { background-color: #f8d7da; color: #721c24; }
-
-.btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
-.btn-primary { background-color: #3498db; color: white; }
-.btn-secondary { background-color: #95a5a6; color: white; }
-.btn-sm { padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+/* General feedback and loading states */
+.feedback-message, .loading-spinner, .no-orders-message {
+  text-align: center;
+  padding: 1rem;
+  margin: 1rem 0;
+}

@@ -1,112 +1,144 @@
-# Auntie's Kitchen Frontend
+# Auntie's Kitchen - Frontend
 
-This project is the frontend for the "Auntie's Kitchen" application, a comprehensive platform for managing restaurant operations. It includes features for customers, kitchen staff, cashiers, and administrators.
-
-## Table of Contents
-- [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Running the Application](#running-the-application)
-- [Key Functionality](#key-functionality)
-- [Contributing](#contributing)
-
-## Features
-
-*   **User Authentication:** Secure login, registration, and OTP verification.
-*   **Customer Dashboard:** Allows customers to view menus and place orders.
-*   **Admin Dashboard:** Provides administrators with tools to manage users, staff, menus, and orders.
-*   **Kitchen Dashboard:** A dedicated view for kitchen staff to manage incoming orders.
-*   **Cashier Dashboard:** A dedicated view for cashiers to handle payments and orders.
-*   **Role-Based Access Control:** Different dashboards and functionalities based on user roles (customer, admin, kitchen, cashier).
+This is the Angular frontend for the Auntie's Kitchen food order management system. It provides a comprehensive user interface for customers, cashiers, kitchen staff, and administrators to interact with the platform.
 
 ## Technologies Used
+- **Angular 17**
+- **TypeScript**
+- **RxJS** for reactive programming
+- **Angular Router** for navigation
+- **Reactive Forms** for robust form handling
 
-*   **Angular:** A powerful framework for building dynamic single-page applications.
-*   **TypeScript:** A typed superset of JavaScript that enhances code quality and maintainability.
-*   **RxJS:** A library for reactive programming using Observables, used for managing asynchronous operations.
-*   **HTML & CSS:** For structuring and styling the application.
+---
 
-## Project Structure
+## Authentication Flow (JWT)
 
-The project follows a standard Angular CLI structure:
+The application uses JSON Web Tokens (JWT) for securing the frontend and communicating with the backend API.
 
+1.  **Login:** A user enters their credentials, which are sent to `POST /api/auth/login`.
+2.  **Receive JWT:** The server validates the credentials and returns a JWT.
+3.  **Store JWT:** The token is stored securely in the browser's `localStorage`.
+4.  **Authorize Requests:** For all subsequent API calls to protected endpoints, the JWT is retrieved from `localStorage` and added to the `Authorization` header as a `Bearer` token. An `HttpInterceptor` handles this automatically.
+5.  **Role-Based Access:** The JWT contains the user's role (e.g., `ROLE_ADMIN`, `ROLE_KITCHEN`), which the frontend uses to grant access to different dashboards and features.
+
+```mermaid
+sequenceDiagram
+    participant Client as Browser
+    participant Server as Backend API
+
+    Client->>Server: POST /api/auth/login (email, password)
+    Server->>Server: Authenticate user, generate JWT with role
+    Server-->>Client: 200 OK (JWT)
+    Client->>Client: Store JWT in localStorage
+
+    Client->>Server: GET /api/orders/admin/all (Authorization: Bearer JWT)
+    Server->>Server: Validate JWT and check for ROLE_ADMIN
+    Server-->>Client: 200 OK (List of all orders)
 ```
-/
-├── src/
-│   ├── app/
-│   │   ├── admin/             # Components for the admin dashboard
-│   │   ├── auth/              # Services for authentication
-│   │   ├── customer-dashboard/ # Components for the customer view
-│   │   ├── kitchen-dashboard/ # Components for the kitchen view
-│   │   ├── cashier-dashboard/ # Components for the cashier view
-│   │   ├── login/             # Login component
-│   │   ├── register/          # Registration component
-│   │   ├── otp-verification/  # OTP verification component
-│   │   ├── orders/            # Components and services for managing orders
-│   │   ├── menu/              # Components and services for managing the menu
-│   │   ├── app.routes.ts      # Main application routing
-│   │   └── ...
-│   ├── assets/              # Static assets like images and styles
-│   └── ...
-├── angular.json             # Angular CLI configuration
-├── package.json             # Project dependencies and scripts
-└── ...
-```
+
+---
+
+## Features & Modules
+
+This application is divided into several role-based modules.
+
+### 1. Admin Dashboard (`/admin-dashboard`)
+
+The central hub for all administrative tasks.
+
+#### Manage Users
+- **UI:** A full-width table displaying all users with the `CUSTOMER` role.
+- **Features:**
+    - **View Customers:** Fetches all users and filters for customers.
+    - **Convert Role:** Admins can change a customer's role to `KITCHEN` or `CASHIER`. The user is then moved to the "Manage Staff" view.
+    - **Auto-Refresh:** The user list automatically refreshes every 3 minutes.
+    - **Create User:** Redirects to the main `/register` page.
+- **Endpoints Used:**
+    - `GET /api/admin/users`
+    - `PUT /api/admin/users/{userId}/role`
+    - `DELETE /api/admin/users/{userId}`
+
+#### Manage Staff
+- **UI:** A two-column layout showing a list of all staff (`ADMIN`, `KITCHEN`, `CASHIER`) and a form to create new staff members.
+- **Features:**
+    - **View Staff:** Displays all non-customer users.
+    - **Create Staff:** A form to create new users with staff roles.
+    - **Update Role:** Change a staff member's role between `KITCHEN` and `CASHIER`.
+    - **Secure Admin Promotion:** Promoting a user to `ADMIN` requires a two-step OTP verification process for security.
+- **Endpoints Used:**
+    - `GET /api/admin/users`
+    - `POST /api/admin/users`
+    - `PUT /api/admin/users/{userId}/role`
+    - `POST /api/admin/promote/initiate`
+    - `POST /api/admin/promote/confirm`
+
+#### Manage Orders
+- **UI:** A spacious, full-width view with powerful filtering/sorting controls and a grid of order cards.
+- **Features:**
+    - **View All Orders:** Displays every order in the system.
+    - **Filtering & Sorting:** Filter by customer name or order status; sort by date or total price.
+    - **Auto-Refresh:** The order list updates every minute.
+    - **Detailed View:** Clicking an order opens a large modal with complete details, including the customer's name and items.
+- **Endpoints Used:**
+    - `GET /api/orders/admin/all`
+
+#### Manage Menu
+- **UI:** A two-column layout with a menu item list and a form for adding/editing items.
+- **Features:** Full CRUD (Create, Read, Update, Delete) functionality for menu items.
+- **Endpoints Used:**
+    - `GET /api/menu`
+    - `POST /api/menu`
+    - `PUT /api/menu/{id}`
+    - `DELETE /api/menu/{id}`
+
+### 2. Kitchen Dashboard (`/kitchen-dashboard`)
+
+A real-time Kitchen Display System (KDS) designed for high-traffic environments.
+
+- **UI:** A Kanban-style board with columns for each order status: `Pending`, `Confirmed`, `Preparing`, and `Ready for Pickup`.
+- **Features:**
+    - **Live Order View:** Displays all active kitchen orders in their respective status columns.
+    - **Auto-Refresh:** The board updates every 20 seconds.
+    - **Sound Notification:** A sound plays whenever a new order arrives.
+    - **Workflow Management:** Kitchen staff can advance an order to the next stage with a single click (e.g., "Start Preparing").
+    - **Automatic Removal:** Orders marked as `COMPLETED` are automatically removed from the board.
+- **Endpoints Used:**
+    - `GET /api/orders/kitchen`
+    - `PUT /api/orders/{orderId}/status`
+
+### 3. Cashier Dashboard (`/cashier-dashboard`)
+
+The Point of Sale (POS) interface for cashiers to create new orders. *(Note: This module is planned and not yet implemented).*
+
+- **Planned Features:**
+    - **Create Orders:** For both registered customers and guests.
+    - **Quick Item Search:** Use `menuCode` to quickly add items to an order.
+    - **Customer Lookup:** Search for registered customers to attach to an order.
+- **Planned Endpoints:**
+    - `POST /api/orders`
+    - `GET /api/menu/search`
+    - `GET /api/admin/users/search`
+
+### 4. Customer Dashboard (`/customer-dashboard`)
+
+A personal dashboard for registered customers. *(Note: This module has not been reviewed or modified yet).*
+
+- **Planned Features:**
+    - View personal order history.
+    - Track the status of current orders.
+- **Planned Endpoints:**
+    - `GET /api/orders/customer`
+
+---
 
 ## Getting Started
 
-### Prerequisites
-
-*   Node.js and npm (Node Package Manager)
-*   Angular CLI (`npm install -g @angular/cli`)
-
-### Installation
-
-1.  Clone the repository:
-    ```sh
-    git clone <repository-url>
-    ```
-2.  Navigate to the project directory:
-    ```sh
-    cd aunties-kitchen-frontend
-    ```
-3.  Install the dependencies:
-    ```sh
+1.  **Install Dependencies:**
+    ```bash
     npm install
     ```
-
-### Running the Application
-
-1.  Start the development server:
-    ```sh
+2.  **Run Development Server:**
+    ```bash
     ng serve
     ```
-2.  Open your browser and navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
-
-## Key Functionality
-
-The application is divided into several key functional areas based on user roles:
-
-*   **/login, /register, /verify-otp:** Handles user authentication and onboarding.
-*   **/customer-dashboard:** The main view for customers to browse the menu and place orders.
-*   **/admin-dashboard:** The central hub for administrators, with access to:
-    *   **/admin/users:** Manage customer accounts.
-    *   **/admin/staff:** Manage staff accounts (kitchen, cashier).
-    *   **/admin/menu:** Add, edit, or remove menu items.
-    *   **/admin/orders:** View and manage all orders in the system.
-*   **/admin/kitchen-dashboard:** A specialized view for kitchen staff to see and update the status of orders.
-*   **/admin/cashier-dashboard:** A specialized view for cashiers to process payments.
-
-## Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1.  Fork the repository.
-2.  Create a new branch (`git checkout -b feature/your-feature-name`).
-3.  Make your changes.
-4.  Commit your changes (`git commit -m 'Add some feature'`).
-5.  Push to the branch (`git push origin feature/your-feature-name`).
-6.  Open a Pull Request.
+    Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.

@@ -2,7 +2,7 @@
   <header>
     <button (click)="goBack()" class="btn btn-secondary">&larr; Back to Dashboard</button>
     <h1>Manage Users</h1>
-    <p>View customer accounts and their order history.</p>
+    <p>View customer accounts and convert them to staff roles if needed.</p>
   </header>
 
   <div *ngIf="feedbackMessage" class="feedback-message success">{{ feedbackMessage }}</div>
@@ -19,7 +19,7 @@
           placeholder="Search by email..."
           class="search-input"
         />
-        <button (click)="navigateToCreateStaff()" class="btn btn-primary">Create New Staff</button>
+        <button (click)="navigateToCreateUser()" class="btn btn-primary">Create New User</button>
       </div>
     </div>
     <div class="card-content">
@@ -32,6 +32,7 @@
             <tr>
               <th>Name</th>
               <th>Email</th>
+              <th>Role</th>
               <th>Verified</th>
               <th>Actions</th>
             </tr>
@@ -40,6 +41,11 @@
             <tr *ngFor="let user of customers">
               <td>{{ user.name }}</td>
               <td>{{ user.email }}</td>
+              <td>
+                <select [value]="user.role.replace('ROLE_', '')" (change)="onRoleChange(user, $event)" class="role-select">
+                  <option *ngFor="let role of availableRoles" [value]="role">{{ role }}</option>
+                </select>
+              </td>
               <td>
                 <span class="status-badge" [class.active]="user.emailVerified">
                   {{ user.emailVerified ? 'Yes' : 'No' }}

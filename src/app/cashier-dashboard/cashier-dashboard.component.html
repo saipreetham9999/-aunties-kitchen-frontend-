@@ -1,75 +1,93 @@
-<div class="dashboard-container cashier-dashboard">
+<div class="dashboard-container">
   <header>
-    <button (click)="goBack()" class="btn btn-secondary" [disabled]="isPlacingOrder">&larr; Back to Dashboard</button>
-    <h1>Cashier Dashboard (POS)</h1>
-    <p>Create new orders for walk-in customers.</p>
+    <button (click)="goBack()" class="btn btn-secondary">&larr; Dashboard</button>
+    <h1>Cashier Point of Sale</h1>
   </header>
 
   <div *ngIf="feedbackMessage" class="feedback-message success">{{ feedbackMessage }}</div>
   <div *ngIf="errorMessage" class="feedback-message error">{{ errorMessage }}</div>
 
-  <div class="pos-layout">
-    <!-- Menu Section -->
-    <div class="menu-section card">
-      <div class="card-header"><h2>Available Menu Items</h2></div>
-      <div class="card-content menu-items">
-        <div *ngIf="isLoadingMenu" class="loading-spinner"><p>Loading menu...</p></div>
-        <div *ngIf="!isLoadingMenu && menuItems.length > 0">
-          <div *ngFor="let item of menuItems" class="menu-item">
-            <span>{{ item.name }} - {{ item.price | currency }}</span>
-            <button (click)="addToCart(item)" class="btn btn-primary btn-sm" [disabled]="isPlacingOrder">Add</button>
-          </div>
+  <div class="pos-grid">
+    <!-- Left Column: Current Order -->
+    <div class="order-panel card">
+      <div class="card-header">
+        <h2>Current Order</h2>
+        <button class="btn btn-danger btn-sm" (click)="resetOrder()" [disabled]="currentOrderItems.length === 0">Clear Order</button>
+      </div>
+      <div class="card-content">
+        <div *ngIf="currentOrderItems.length === 0" class="empty-order">
+          <p>No items added yet. Use the search on the right to add items.</p>
         </div>
-        <div *ngIf="!isLoadingMenu && menuItems.length === 0" class="empty-state"><p>No menu items available.</p></div>
+        <ul *ngIf="currentOrderItems.length > 0" class="order-item-list">
+          <li *ngFor="let item of currentOrderItems">
+            <div class="item-info">
+              <span class="item-name">{{ item.menuItemName }}</span>
+              <span class="item-price">{{ item.price | currency:'INR' }}</span>
+            </div>
+            <div class="item-controls">
+              <button (click)="updateQuantity(item, -1)" class="btn btn-secondary btn-sm">-</button>
+              <span class="item-quantity">{{ item.quantity }}</span>
+              <button (click)="updateQuantity(item, 1)" class="btn btn-secondary btn-sm">+</button>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="card-footer" *ngIf="currentOrderItems.length > 0">
+        <div class="total-price">
+          <span>Total:</span>
+          <strong>{{ totalPrice | currency:'INR' }}</strong>
+        </div>
       </div>
     </div>
 
-    <!-- Order Section -->
-    <div class="order-section">
-      <!-- Customer Selection Card -->
-      <div class="card customer-card">
-        <div class="card-header"><h2>Customer</h2></div>
+    <!-- Right Column: Controls -->
+    <div class="controls-panel">
+      <!-- Menu Search -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Add Items</h3>
+        </div>
         <div class="card-content">
-          <div *ngIf="selectedCustomer" class="selected-customer">
-            <span><i class="icon user"></i>{{ selectedCustomer.name }} ({{ selectedCustomer.email }})</span>
-            <button (click)="clearCustomer()" class="btn btn-secondary btn-sm" [disabled]="isPlacingOrder">Change</button>
+          <div class="search-field">
+            <label for="menu-search">Search by Item Code:</label>
+            <input id="menu-search" type="text" [(ngModel)]="menuSearchTerm" (keyup.enter)="onMenuSearch()" placeholder="e.g., 0001">
+            <button (click)="onMenuSearch()" class="btn btn-primary">Search</button>
           </div>
-          <div *ngIf="!selectedCustomer">
-            <div class="form-group">
-              <label>Search Registered Customer</label>
-              <input type="text" (input)="onSearch($event)" placeholder="Search by name or email..." class="form-control">
-              <div *ngIf="isSearching" class="loading-spinner small"></div>
-              <ul *ngIf="foundUsers.length > 0" class="search-results">
-                <li *ngFor="let user of foundUsers" (click)="selectCustomer(user)">
-                  {{ user.name }} - {{ user.email }}
-                </li>
-              </ul>
-            </div>
-            <div class="form-group">
-              <label>Or Enter Guest Name</label>
-              <input type="text" [(ngModel)]="guestName" placeholder="e.g., John Doe" class="form-control" [disabled]="isPlacingOrder">
-            </div>
+          <div *ngIf="menuSearchError" class="search-error">{{ menuSearchError }}</div>
+          <div *ngIf="foundMenuItem" class="search-result">
+            <span>{{ foundMenuItem.name }} - {{ foundMenuItem.price | currency:'INR' }}</span>
+            <button (click)="addItemToOrder(foundMenuItem)" class="btn btn-success btn-sm">Add</button>
           </div>
         </div>
       </div>
 
-      <!-- Cart Card -->
-      <div class="card cart-card">
-        <div class="card-header"><h2>Current Order</h2></div>
-        <div class="card-content cart-items">
-          <div *ngFor="let item of cartItems" class="cart-item">
-            <span>{{ item.name }} ({{ item.price | currency }})</span>
-            <div class="quantity-controls">
-              <button (click)="removeFromCart(item)" class="btn btn-danger btn-sm" [disabled]="isPlacingOrder">-</button>
-              <span>{{ item.quantity }}</span>
-              <button (click)="addToCart(item)" class="btn btn-success btn-sm" [disabled]="isPlacingOrder">+</button>
-            </div>
-          </div>
-          <div *ngIf="cartItems.length === 0" class="empty-state"><p>Cart is empty.</p></div>
+      <!-- Customer and Finalize -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Finalize Order</h3>
         </div>
-        <div class="card-footer">
-          <div class="cart-total"><strong>Total: {{ calculateTotal() | currency }}</strong></div>
-          <button (click)="placeOrder()" [disabled]="cartItems.length === 0 || isPlacingOrder || (!selectedCustomer && !guestName.trim())" class="btn btn-primary btn-block">
+        <div class="card-content">
+          <div class="customer-type-toggle">
+            <button [class.active]="isGuestOrder" (click)="setOrderType(true)">Guest Order</button>
+            <button [class.active]="!isGuestOrder" (click)="setOrderType(false)">Registered Customer</button>
+          </div>
+
+          <div *ngIf="isGuestOrder" class="search-field">
+            <label for="guest-name">Guest Name:</label>
+            <input id="guest-name" type="text" [(ngModel)]="guestName" placeholder="Enter guest's name">
+          </div>
+
+          <div *ngIf="!isGuestOrder" class="search-field">
+            <label for="customer-search">Search Customer:</label>
+            <input id="customer-search" type="text" [(ngModel)]="customerSearchTerm" (ngModelChange)="onCustomerSearch()" placeholder="Enter name or email...">
+            <ul *ngIf="foundCustomers.length > 0" class="customer-results">
+              <li *ngFor="let customer of foundCustomers" (click)="selectCustomer(customer)">
+                {{ customer.name }} ({{ customer.email }})
+              </li>
+            </ul>
+          </div>
+
+          <button (click)="placeOrder()" class="btn btn-primary btn-lg btn-block" [disabled]="isPlacingOrder">
             {{ isPlacingOrder ? 'Placing Order...' : 'Place Order' }}
           </button>
         </div>

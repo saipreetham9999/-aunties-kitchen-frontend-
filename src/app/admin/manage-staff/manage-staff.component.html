@@ -9,8 +9,11 @@
   <div *ngIf="errorMessage" class="feedback-message error">{{ errorMessage }}</div>
 
   <div class="content-grid">
+    <!-- Staff List Section -->
     <section class="card">
-      <h2 class="card-header">All Staff</h2>
+      <div class="card-header">
+        <h2>All Staff</h2>
+      </div>
       <div class="card-content">
         <div class="table-container">
           <table class="data-table">
@@ -27,9 +30,7 @@
                 <td>{{ user.name }}</td>
                 <td>{{ user.email }}</td>
                 <td>
-                  <!-- The user.role from the backend includes the prefix (e.g., 'ROLE_ADMIN') -->
                   <select [value]="user.role.replace('ROLE_', '')" (change)="onRoleChange(user, $event)" class="role-select" [disabled]="user.role === 'ROLE_ADMIN'">
-                    <!-- The value for the option should be the clean name for the update API -->
                     <option *ngFor="let role of availableRolesForUpdate" [value]="role">{{ role }}</option>
                   </select>
                 </td>
@@ -43,8 +44,11 @@
       </div>
     </section>
 
+    <!-- Create Staff Form Section -->
     <section class="card">
-      <h2 class="card-header">Create New Staff Member</h2>
+      <div class="card-header">
+        <h2>Create New Staff</h2>
+      </div>
       <div class="card-content">
         <form [formGroup]="createUserForm" (ngSubmit)="onCreateStaff()" class="modern-form">
           <div class="form-field">

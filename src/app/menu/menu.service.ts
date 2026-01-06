@@ -38,6 +38,10 @@ export class MenuService {
     return this.http.get<MenuItem[]>(this.apiUrl).pipe(catchError(this.handleError));
   }
 
+  searchMenuItemByCode(code: string): Observable<MenuItem> {
+    return this.http.get<MenuItem>(`${this.apiUrl}/search?code=${code}`).pipe(catchError(this.handleError));
+  }
+
   addMenuItem(item: Omit<MenuItem, 'id'>): Observable<MenuItem> {
     const headers = this.createAuthHeaders();
     if (!headers) return throwError(() => new Error('No authentication token found.'));

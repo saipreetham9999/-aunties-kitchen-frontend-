@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UserService, User, CleanRole } from '../user.service';
+import { UserService, User, CleanRole, PrefixedRole } from '../user.service';
 
 @Component({
   selector: 'app-manage-staff',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule], // Removed unused RouterLink
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './manage-staff.component.html',
   styleUrls: ['../manage-users/manage-users.component.css']
 })
@@ -18,7 +18,6 @@ export class ManageStaffComponent implements OnInit {
   feedbackMessage: string | null = null;
   errorMessage: string | null = null;
 
-  // Clean roles are used for UI display and for sending updates to the backend.
   availableRolesForUpdate: CleanRole[] = ['KITCHEN', 'CASHIER', 'ADMIN'];
 
   showOtpModal = false;
@@ -28,7 +27,8 @@ export class ManageStaffComponent implements OnInit {
   constructor(
     private userService: UserService,
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef // Inject ChangeDetectorRef
   ) {
     this.createUserForm = this.fb.group({
       name: ['', Validators.required],
@@ -45,8 +45,8 @@ export class ManageStaffComponent implements OnInit {
   loadStaff(): void {
     this.userService.getUsers().subscribe({
       next: (data) => {
-        // This comparison is now valid because the User interface expects the prefix.
         this.staff = data.filter(u => u.role !== 'ROLE_CUSTOMER');
+        this.cdr.detectChanges(); // Manually trigger change detection
       },
       error: (err: any) => this.handleError('Failed to load staff members.')
     });
@@ -62,6 +62,7 @@ export class ManageStaffComponent implements OnInit {
         this.showFeedback(`Staff member ${newUser.name} created.`);
         this.staff.push(newUser);
         this.createUserForm.reset({ role: 'KITCHEN' });
+        this.cdr.detectChanges(); // Manually trigger change detection
       },
       error: (err: any) => this.handleError(err.error?.message || 'Failed to create staff member.')
     });
@@ -80,11 +81,20 @@ export class ManageStaffComponent implements OnInit {
     this.userService.updateUserRole(user.id, newRole).subscribe({
       next: () => {
         this.showFeedback(`Role updated for ${user.name}.`);
-        this.loadStaff(); // Reload to get the correct state from the server.
+        const userIndex = this.staff.findIndex(u => u.id === user.id);
+        if (userIndex > -1) {
+          this.staff = this.staff.map((staffUser, index) => {
+            if (index === userIndex) {
+              return { ...staffUser, role: `ROLE_${newRole}` as PrefixedRole };
+            }
+            return staffUser;
+          });
+        }
+        this.cdr.detectChanges(); // Manually trigger change detection
       },
       error: (err: any) => {
         this.handleError(err.error?.message || 'Failed to update role.');
-        this.loadStaff(); // Reload to reset the dropdown on failure.
+        this.loadStaff();
       }
     });
   }
@@ -95,6 +105,7 @@ export class ManageStaffComponent implements OnInit {
       next: (response) => {
         this.showFeedback(response.message || 'An OTP has been sent to the current admin\'s email for confirmation.');
         this.showOtpModal = true;
+        this.cdr.detectChanges(); // Manually trigger change detection
       },
       error: (err: any) => {
         this.handleError(err.error?.message || 'Failed to initiate promotion.');
@@ -108,7 +119,6 @@ export class ManageStaffComponent implements OnInit {
     this.userService.completeAdminPromotion(this.userToPromote.id, this.otpForPromotion).subscribe({
       next: (response) => {
         this.showFeedback(response.message || 'Promotion successful.');
-        // This assignment is now valid as the User interface expects the prefix.
         this.updateUserInList(this.userToPromote!.id, { role: 'ROLE_ADMIN' });
         this.closeOtpModal();
       },
@@ -129,6 +139,7 @@ export class ManageStaffComponent implements OnInit {
         next: () => {
           this.showFeedback(`Staff member ${user.name} has been deleted.`);
           this.staff = this.staff.filter(u => u.id !== user.id);
+          this.cdr.detectChanges(); // Manually trigger change detection
         },
         error: (err: any) => this.handleError('Failed to delete staff member.')
       });
@@ -142,6 +153,7 @@ export class ManageStaffComponent implements OnInit {
   private updateUserInList(userId: string, changes: Partial<User>): void {
     const user = this.staff.find(u => u.id === userId);
     if (user) Object.assign(user, changes);
+    this.cdr.detectChanges(); // Manually trigger change detection
   }
 
   private showFeedback(message: string): void {

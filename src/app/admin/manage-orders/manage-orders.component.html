@@ -2,35 +2,96 @@
   <header>
     <button (click)="goBack()" class="btn btn-secondary">&larr; Back to Dashboard</button>
     <h1>Manage Orders</h1>
-    <p>View a complete history of all orders placed in the system.</p>
+    <p>View, filter, and sort all orders placed in the system.</p>
   </header>
 
   <div *ngIf="errorMessage" class="feedback-message error">{{ errorMessage }}</div>
 
-  <div *ngIf="!errorMessage && orders.length === 0" class="feedback-message info">
-    No orders found in the system.
+  <!-- Filter and Sort Controls -->
+  <div class="controls-bar card">
+    <div class="control-group">
+      <label for="filter-user">Filter by Customer:</label>
+      <input id="filter-user" type="text" [(ngModel)]="filterUser" (ngModelChange)="onFilterChange()" placeholder="Enter customer name...">
+    </div>
+    <div class="control-group">
+      <label for="filter-status">Filter by Status:</label>
+      <select id="filter-status" [(ngModel)]="filterStatus" (ngModelChange)="onFilterChange()">
+        <option value="ALL">All Statuses</option>
+        <option value="PENDING">Pending</option>
+        <option value="CONFIRMED">Confirmed</option>
+        <option value="PREPARING">Preparing</option>
+        <option value="READY_FOR_PICKUP">Ready for Pickup</option>
+        <option value="COMPLETED">Completed</option>
+        <option value="CANCELLED">Cancelled</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Sort by:</label>
+      <div class="sort-buttons">
+        <button class="btn" [class.active]="sortKey === 'date'" (click)="onSortChange('date')">
+          Date <span *ngIf="sortKey === 'date'">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span>
+        </button>
+        <button class="btn" [class.active]="sortKey === 'total'" (click)="onSortChange('total')">
+          Total <span *ngIf="sortKey === 'total'">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div class="order-grid">
-    <div *ngFor="let order of orders" class="order-card">
+  <!-- Loading and Empty States -->
+  <div *ngIf="isLoading" class="loading-spinner">Loading orders...</div>
+  <div *ngIf="!isLoading && filteredOrders.length === 0 && !errorMessage" class="empty-state">
+    <p>No orders match your current filters.</p>
+  </div>
+
+  <!-- Order Grid -->
+  <div *ngIf="!isLoading" class="order-grid">
+    <div *ngFor="let order of filteredOrders" class="order-card" (click)="selectOrder(order)">
       <div class="order-header">
-        <span class="order-id">Order #{{ order.id }}</span>
-        <span class="order-date">{{ order.date }}</span>
+        <span class="order-id">Order #{{ order.id.substring(0, 8) }}...</span>
+        <span class="order-status status-{{ order.status.toLowerCase().replace('_', '-') }}">{{ order.status }}</span>
       </div>
-      <div class="order-status status-{{ order.status.toLowerCase().replace('_', '-') }}">
-        Status: {{ order.status }}
+      <div class="order-body">
+        <div class="order-customer">{{ order.customerName || 'Guest' }}</div>
+        <div class="order-total">{{ order.total | currency:'INR' }}</div>
       </div>
-      <div class="order-details">
-        <h4>Items:</h4>
-        <ul>
-          <li *ngFor="let item of order.items">
-            {{ item.quantity }} x {{ item.menuItemName }} - {{ item.price | currency }}
-          </li>
-        </ul>
-        <div class="order-total">
-          <strong>Total: {{ order.total | currency }}</strong>
-        </div>
+      <div class="order-footer">
+        <span>{{ order.date | date:'short' }}</span>
+        <span>{{ order.items.length }} items</span>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Order Detail Modal -->
+<div class="modal-overlay" *ngIf="selectedOrder" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Order #{{ selectedOrder.id }}</h2>
+      <button class="close-btn" (click)="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-row">
+        <strong>Customer:</strong> {{ selectedOrder.customerName || 'Guest' }}
+      </div>
+      <div class="detail-row">
+        <strong>Date:</strong> {{ selectedOrder.date | date:'full' }}
+      </div>
+      <div class="detail-row">
+        <strong>Status:</strong>
+        <span class="order-status status-{{ selectedOrder.status.toLowerCase().replace('_', '-') }}">{{ selectedOrder.status }}</span>
+      </div>
+      <div class="detail-row">
+        <strong>Total:</strong> {{ selectedOrder.total | currency:'INR' }}
+      </div>
+
+      <h4>Items:</h4>
+      <ul class="item-list">
+        <li *ngFor="let item of selectedOrder.items">
+          <span>{{ item.quantity }} x {{ item.menuItemName }}</span>
+          <span>{{ item.price * item.quantity | currency:'INR' }}</span>
+        </li>
+      </ul>
     </div>
   </div>
 </div>
